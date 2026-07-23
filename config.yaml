@@ -1,0 +1,21 @@
+# InsightAgent Configuration
+version: "1.0.0"
+
+llm:
+  nim_base_url: "https://integrate.api.nvidia.com/v1"
+  groq_base_url: "https://api.groq.com/openai/v1"
+  models:
+    analysis: "meta/llama-3.3-70b-instruct"    # NIM: deep analysis
+    strategy: "meta/llama-3.3-70b-instruct"    # NIM: strategy
+    fast: "meta/llama-3.3-70b-instruct"         # NIM: quick
+    groq_fallback: "llama-3.3-70b-versatile"   # Groq fallback
+
+scanner:
+  timeout: 15
+  user_agent: "Mozilla/5.0 (compatible; InsightAgent/1.0)"
+  max_pages: 20
+
+output:
+  dir: "reports"
+  formats: ["markdown", "pdf"]
+  language: "en"
