@@ -5,7 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .base_agent import BaseLLMAgent
+from .skill_loader import load_skill
 from scanner.web_scanner import ScanResult
+
+_SEO_SKILL_FALLBACK = (
+    "You are an expert SEO consultant. Analyze the website data and provide "
+    "actionable, specific recommendations. Be concise and practical. "
+    "Format output as plain text with sections."
+)
 
 
 @dataclass
@@ -29,11 +36,7 @@ class SEOAgent(BaseLLMAgent):
         analysis.grade = self._grade(analysis.score)
         analysis.technical_fixes = list(scan.issues + scan.warnings)
 
-        system = (
-            "You are an expert SEO consultant. Analyze the website data and provide "
-            "actionable, specific recommendations. Be concise and practical. "
-            "Format output as plain text with sections."
-        )
+        system = load_skill("seo_auditor", fallback=_SEO_SKILL_FALLBACK)
 
         keywords_str = ", ".join(target_keywords) if target_keywords else "not specified"
         user = f"""Website SEO Audit Data for {scan.domain}:

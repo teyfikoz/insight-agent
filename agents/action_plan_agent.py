@@ -6,6 +6,14 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .base_agent import BaseLLMAgent
+from .skill_loader import load_skill
+
+_PLAN_SKILL_FALLBACK = (
+    "You are a senior business consultant and growth strategist. "
+    "Create a concrete, prioritized action plan based on website audit data. "
+    "Be specific with timelines and expected outcomes. "
+    "Format as a structured report with clear sections."
+)
 
 
 @dataclass
@@ -48,12 +56,7 @@ class ActionPlanAgent(BaseLLMAgent):
         plan = ActionPlan(domain=domain)
         plan.overall_health_score = seo_score
 
-        system = (
-            "You are a senior business consultant and growth strategist. "
-            "Create a concrete, prioritized action plan based on website audit data. "
-            "Be specific with timelines and expected outcomes. "
-            "Format as a structured report with clear sections."
-        )
+        system = load_skill("action_planner", fallback=_PLAN_SKILL_FALLBACK)
 
         user = f"""Create an executive action plan for {domain}:
 
