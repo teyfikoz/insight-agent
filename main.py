@@ -6,6 +6,8 @@ Usage:
     python3 main.py --target example.com
     python3 main.py --target example.com --report full --output ~/Desktop/reports/
     python3 main.py --target example.com --keywords "saas, monitoring, uptime"
+    python3 main.py --dashboard          # Start web dashboard (port 7890)
+    python3 main.py --monitor example.com --interval 3600  # Continuous monitoring
 """
 
 from __future__ import annotations
@@ -46,8 +48,8 @@ def _load_env() -> None:
                     os.environ.setdefault(k, val.strip().strip('"\''))
 
 
-@click.command()
-@click.option("--target", "-t", required=True, help="URL or domain to analyze")
+@click.command(context_settings={"ignore_unknown_options": True})
+@click.option("--target", "-t", default="", help="URL or domain to analyze")
 @click.option("--output", "-o", default="reports", help="Output directory (default: reports/)")
 @click.option("--report", "-r", default="full",
               type=click.Choice(["full", "seo", "quick"]),
@@ -55,10 +57,51 @@ def _load_env() -> None:
 @click.option("--keywords", "-k", default="", help="Comma-separated target keywords")
 @click.option("--no-pdf", is_flag=True, help="Skip PDF generation")
 @click.option("--no-md", is_flag=True, help="Skip Markdown generation")
-def main(target: str, output: str, report: str, keywords: str, no_pdf: bool, no_md: bool):
+@click.option("--dashboard", is_flag=True, help="Start web dashboard at http://localhost:7890")
+@click.option("--monitor", default="", help="Domain to monitor continuously")
+@click.option("--interval", default=3600, help="Monitor interval in seconds (default: 3600)")
+def main(target: str, output: str, report: str, keywords: str,
+         no_pdf: bool, no_md: bool, dashboard: bool, monitor: str, interval: int):
     """InsightAgent — AI-powered website intelligence."""
 
     _load_env()
+
+    # Dashboard mode
+    if dashboard:
+        console.print(Panel.fit(
+            "[bold]InsightAgent Dashboard[/bold]\n"
+            "[dim]Starting at http://localhost:7890[/dim]",
+            border_style="blue"
+        ))
+        from dashboard.server import run as run_dashboard
+        run_dashboard()
+        return
+
+    # Monitor mode (continuous)
+    if monitor:
+        import time
+        console.print(Panel.fit(
+            f"[bold blue]InsightAgent Monitor[/bold blue]\n"
+            f"[dim]Target: {monitor} · Interval: {interval}s[/dim]",
+            border_style="blue"
+        ))
+        run_count = 0
+        while True:
+            run_count += 1
+            console.print(f"\n[bold]Run #{run_count}[/bold] — {monitor}")
+            _run_scan(monitor, output, report, keywords, no_pdf, no_md)
+            console.print(f"[dim]Next scan in {interval}s (Ctrl+C to stop)[/dim]")
+            time.sleep(interval)
+        return
+
+    if not target:
+        console.print("[red]Error:[/red] --target is required (or use --dashboard / --monitor)")
+        raise SystemExit(1)
+
+    _run_scan(target, output, report, keywords, no_pdf, no_md)
+
+
+def _run_scan(target: str, output: str, report: str, keywords: str, no_pdf: bool, no_md: bool):
 
     console.print(Panel.fit(
         "[bold blue]InsightAgent[/bold blue] — AI-powered website intelligence\n"
@@ -67,6 +110,7 @@ def main(target: str, output: str, report: str, keywords: str, no_pdf: bool, no_
     ))
 
     keyword_list = [k.strip() for k in keywords.split(",") if k.strip()]
+    _load_env()
 
     # Step 1: Scan
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"),
@@ -166,4 +210,4 @@ def main(target: str, output: str, report: str, keywords: str, no_pdf: bool, no_
 
 if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).parent))
-    main()
+    main()  # pylint: disable=no-value-for-parameter
