@@ -41,21 +41,24 @@ rsync -a --exclude='.venv' --exclude='__pycache__' --exclude='.git' \
 
 # ── 3. Download wheels for macOS + Windows (universal where possible) ─────────
 echo "[2/4] Downloading Python wheels..."
-pip download \
+# Use python3 -m pip to avoid relying on 'pip' being in PATH
+PIP_CMD="python3 -m pip"
+
+$PIP_CMD download \
     --dest "$DEST/wheels" \
     --prefer-binary \
     -r "$SCRIPT_DIR/requirements.txt" \
-    2>/dev/null || true
+    --quiet || true
 
 # Try to get Windows-compatible wheels too (only works on non-cross-compile setups)
-pip download \
+$PIP_CMD download \
     --dest "$DEST/wheels" \
     --prefer-binary \
     --platform win_amd64 \
     --python-version 311 \
     --only-binary :all: \
     -r "$SCRIPT_DIR/requirements.txt" \
-    2>/dev/null || true
+    --quiet 2>/dev/null || true
 
 echo "    Wheels downloaded: $(ls "$DEST/wheels" | wc -l | tr -d ' ')"
 
