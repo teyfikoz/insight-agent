@@ -1,4 +1,4 @@
-"""Base LLM agent — NIM primary → Groq fallback → rule-based."""
+"""Base LLM agent — NIM primary → Groq → Gemini → rule-based."""
 
 from __future__ import annotations
 
@@ -7,16 +7,19 @@ from typing import Any
 
 
 class BaseLLMAgent:
-    """Routes requests: NIM → Groq → rule-based fallback."""
+    """Routes requests: NIM → Groq → Gemini → rule-based fallback."""
 
     NIM_BASE = "https://integrate.api.nvidia.com/v1"
     GROQ_BASE = "https://api.groq.com/openai/v1"
+    GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai/"
     NIM_MODEL = "meta/llama-3.3-70b-instruct"
     GROQ_MODEL = "llama-3.3-70b-versatile"
+    GEMINI_MODEL = "gemini-2.0-flash"
 
     def __init__(self):
         self._nim_key = os.environ.get("NVIDIA_NIM_API_KEY") or os.environ.get("NIM_API_KEY")
         self._groq_key = os.environ.get("GROQ_API_KEY")
+        self._gemini_key = os.environ.get("GEMINI_API_KEY")
         self._provider = "none"
 
     def _call_nim(self, system: str, user: str, max_tokens: int = 1500) -> str | None:
@@ -59,9 +62,30 @@ class BaseLLMAgent:
         except Exception:
             return None
 
+    def _call_gemini(self, system: str, user: str, max_tokens: int = 1500) -> str | None:
+        if not self._gemini_key:
+            return None
+        try:
+            from openai import OpenAI
+            client = OpenAI(
+                api_key=self._gemini_key,
+                base_url=self.GEMINI_BASE,
+            )
+            resp = client.chat.completions.create(
+                model=self.GEMINI_MODEL,
+                messages=[{"role": "system", "content": system},
+                          {"role": "user", "content": user}],
+                max_tokens=max_tokens,
+                temperature=0.3,
+            )
+            self._provider = "Gemini"
+            return resp.choices[0].message.content or ""
+        except Exception:
+            return None
+
     def generate(self, system: str, user: str, max_tokens: int = 1500,
                  fallback_fn=None) -> str:
-        """Try NIM → Groq → rule-based fallback."""
+        """Try NIM → Groq → Gemini → rule-based fallback."""
         result = self._call_nim(system, user, max_tokens)
         if result:
             return result
@@ -70,10 +94,14 @@ class BaseLLMAgent:
         if result:
             return result
 
+        result = self._call_gemini(system, user, max_tokens)
+        if result:
+            return result
+
         self._provider = "rule-based"
         if fallback_fn:
             return fallback_fn()
-        return "[AI analysis unavailable — set NVIDIA_NIM_API_KEY or GROQ_API_KEY]"
+        return "[AI analysis unavailable — set NVIDIA_NIM_API_KEY, GROQ_API_KEY, or GEMINI_API_KEY]"
 
     @property
     def provider(self) -> str:

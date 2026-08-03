@@ -204,7 +204,7 @@ def _run_scan(target: str, output: str, report: str, keywords: str, no_pdf: bool
 
     if plan.provider == "rule-based":
         console.print(
-            "\n[dim]Tip: Set NVIDIA_NIM_API_KEY or GROQ_API_KEY for AI-powered insights.[/dim]"
+            "\n[dim]Tip: Set NVIDIA_NIM_API_KEY, GROQ_API_KEY, or GEMINI_API_KEY for AI-powered insights.[/dim]"
         )
 
 
