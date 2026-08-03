@@ -148,6 +148,53 @@ async def list_jobs():
     return JSONResponse(list(JOBS.values()))
 
 
+@app.get("/api/settings")
+async def get_settings():
+    env_file = ROOT / ".env"
+    settings = {}
+    if env_file.exists():
+        for line in env_file.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, _, v = line.partition("=")
+                settings[k.strip()] = v.strip().strip('"\'')
+    # Mask key values partially for display
+    masked = {}
+    for k, v in settings.items():
+        if "KEY" in k and len(v) > 8:
+            masked[k] = v  # send full value so input fields populate
+        else:
+            masked[k] = v
+    return JSONResponse(masked)
+
+
+@app.post("/api/settings")
+async def save_settings(request: Request):
+    data = await request.json()
+    env_file = ROOT / ".env"
+    # Load existing
+    existing = {}
+    if env_file.exists():
+        for line in env_file.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, _, v = line.partition("=")
+                existing[k.strip()] = v.strip().strip('"\'')
+    # Merge — only update non-empty values
+    for k, v in data.items():
+        if v:
+            existing[k] = v
+        elif k in existing and not v:
+            del existing[k]  # remove if cleared
+    # Write back
+    lines = [f"{k}={v}" for k, v in existing.items()]
+    env_file.write_text("\n".join(lines) + "\n")
+    # Reload into os.environ for current session
+    for k, v in existing.items():
+        os.environ[k] = v
+    return JSONResponse({"status": "ok", "message": f"Saved {len(existing)} settings to .env"})
+
+
 @app.get("/api/status")
 async def status():
     reports_count = len(list((ROOT / "reports").glob("*.md"))) if (ROOT / "reports").exists() else 0

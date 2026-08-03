@@ -174,6 +174,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Skills &amp; AI
       </div>
+      <div class="nav-item" onclick="showPage('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
     </nav>
     <div class="sidebar-footer">
       <p><span class="status-dot"></span><span id="status-text">Starting...</span></p>
@@ -378,6 +382,90 @@
   </main>
 </div>
 
+    <!-- Settings -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <h2>Settings</h2>
+        <p>API keys — stored only in your local .env file, never sent anywhere</p>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="scan-box" style="margin-bottom:16px">
+            <h3>AI Provider Keys</h3>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">All keys optional. Fallback chain: NIM → Groq → Gemini → rule-based (always works offline)</p>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>NVIDIA NIM API Key <span style="color:var(--accent2);font-size:10px">PRIMARY — best quality</span></label>
+              <input type="password" id="key-nim" placeholder="nvapi-..." />
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Groq API Key <span style="color:var(--yellow);font-size:10px">SECONDARY — fast, free tier</span></label>
+              <input type="password" id="key-groq" placeholder="gsk_..." />
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+              <label>Google Gemini API Key <span style="color:var(--muted);font-size:10px">TERTIARY — 1M token context</span></label>
+              <input type="password" id="key-gemini" placeholder="AIza..." />
+            </div>
+            <div class="flex">
+              <button class="btn" onclick="saveSettings()">Save to .env</button>
+              <button class="btn btn-outline btn-sm" onclick="loadSettings()">Load current</button>
+            </div>
+          </div>
+
+          <div class="scan-box" style="margin-bottom:0">
+            <h3>Scan Defaults</h3>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div class="form-group">
+                <label>Default Report Type</label>
+                <select id="default-report">
+                  <option value="full">Full Report</option>
+                  <option value="seo">SEO Only</option>
+                  <option value="quick">Quick Scan</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Scan Timeout (seconds)</label>
+                <input type="number" id="scan-timeout" value="120" min="30" max="300" />
+              </div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="saveDefaults()" style="margin-top:12px">Save Defaults</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="section-title">API Key Guide</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+              <div class="skill-card">
+                <div class="skill-name" style="font-size:12px">NVIDIA NIM — Best Quality</div>
+                <div class="skill-meta">integrate.api.nvidia.com — free credits on signup</div>
+              </div>
+              <div class="skill-card">
+                <div class="skill-name" style="font-size:12px">Groq — Fast &amp; Free</div>
+                <div class="skill-meta">console.groq.com — 14,400 req/day free</div>
+              </div>
+              <div class="skill-card">
+                <div class="skill-name" style="font-size:12px">Google Gemini — Large Context</div>
+                <div class="skill-meta">aistudio.google.com — 1M token context window</div>
+              </div>
+              <div class="skill-card">
+                <div class="skill-name" style="font-size:12px;color:var(--green)">No Key — Always Works</div>
+                <div class="skill-meta">Rule-based fallback, 100% offline, no API needed</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">Privacy</div>
+            <div class="card-sub" style="line-height:1.7">
+              Keys are stored only in <code style="color:var(--accent2);font-size:11px">.env</code> on this device.<br>
+              Never uploaded, logged, or shared.<br>
+              The <code style="color:var(--accent2);font-size:11px">.env</code> file is git-ignored by default.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -394,6 +482,7 @@ function showPage(name) {
   if (name === 'jobs') loadJobs();
   if (name === 'skills') loadSkillStatus();
   if (name === 'overview') loadOverview();
+  if (name === 'settings') loadSettings();
 }
 
 function toast(msg, type='success') {
@@ -569,6 +658,39 @@ async function loadSkillStatus() {
   const pill = document.getElementById('seo-skill-pill');
   pill.textContent = d.has_optimized_skill ? 'optimized' : 'seed';
   pill.className = 'pill ' + (d.has_optimized_skill ? 'optimized' : 'seed');
+}
+
+// Settings
+async function loadSettings() {
+  const r = await fetch('/api/settings');
+  if (!r.ok) return;
+  const d = await r.json();
+  if (d.NVIDIA_NIM_API_KEY) document.getElementById('key-nim').value = d.NVIDIA_NIM_API_KEY;
+  if (d.GROQ_API_KEY) document.getElementById('key-groq').value = d.GROQ_API_KEY;
+  if (d.GEMINI_API_KEY) document.getElementById('key-gemini').value = d.GEMINI_API_KEY;
+  if (d.DEFAULT_REPORT) document.getElementById('default-report').value = d.DEFAULT_REPORT;
+  if (d.SCAN_TIMEOUT) document.getElementById('scan-timeout').value = d.SCAN_TIMEOUT;
+}
+
+async function saveSettings() {
+  const payload = {
+    NVIDIA_NIM_API_KEY: document.getElementById('key-nim').value.trim(),
+    GROQ_API_KEY: document.getElementById('key-groq').value.trim(),
+    GEMINI_API_KEY: document.getElementById('key-gemini').value.trim(),
+  };
+  const r = await fetch('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+  const d = await r.json();
+  toast(d.message || 'Saved!', d.status === 'ok' ? 'success' : 'error');
+}
+
+async function saveDefaults() {
+  const payload = {
+    DEFAULT_REPORT: document.getElementById('default-report').value,
+    SCAN_TIMEOUT: document.getElementById('scan-timeout').value,
+  };
+  const r = await fetch('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+  const d = await r.json();
+  toast(d.message || 'Saved!', d.status === 'ok' ? 'success' : 'error');
 }
 
 // Init
