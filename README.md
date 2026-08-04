@@ -1,293 +1,289 @@
 # InsightAgent — AI-Powered Website Intelligence
 
-> Bir domain adı gir, dakikalar içinde SEO analizi + yöneticiye sunulabilir aksiyon planı al.
-> NVIDIA NIM → Groq → rule-based fallback zinciri. Tamamen lokal çalışır, hiçbir veri dışarı çıkmaz.
+> **Scan any website in seconds. Get an AI-generated SEO audit, action plan, and PDF report.**
+> Works 100% offline — perfect for USB deployment. No data ever leaves your machine.
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Offline Ready](https://img.shields.io/badge/Offline-Ready-green.svg)](#usb-offline-mode)
 
 ---
 
-## Özellikler
+## What It Does
 
-| Modül | Ne yapar |
-|---|---|
-| **WebScanner** | SSL, yük süresi, title/meta, schema, sitemap, robot.txt, Open Graph taraması |
-| **SEOAgent** | NIM/Groq ile SEO skoru (0-100), hızlı kazanımlar, keyword önerileri |
-| **ActionPlanAgent** | Yönetici özeti + 7 / 30 / 90 günlük aksiyon planı |
-| **SkillOpt** | Skill dosyalarını otomatik eğitir → zamanla daha iyi çıktı |
-| **Raporlar** | Markdown + PDF olarak kaydeder |
+InsightAgent scans a website and produces a professional intelligence report in under 60 seconds:
+
+| Module | What it analyzes |
+|--------|-----------------|
+| **WebScanner** | SSL certificate, load time, title/meta tags, schema markup, sitemap, robots.txt, Open Graph |
+| **SEOAgent** | AI-powered SEO score (0–100), quick wins, keyword opportunities |
+| **ActionPlanAgent** | Executive summary + 7 / 30 / 90-day action plan with effort/impact ratings |
+| **SkillOpt** | Self-improving prompt engine — gets smarter with every scan |
+| **Reports** | Markdown + optional PDF output |
+
+**AI Chain (automatic fallback):**
+```
+NVIDIA NIM → Groq → Google Gemini → Rule-Based (always works offline)
+```
+All providers are optional. InsightAgent works without any API key using built-in rule-based analysis.
 
 ---
 
-## Kurulum
+## Management Dashboard
 
-### A — GitHub'dan (önerilen)
+Launch the full web dashboard:
+```bash
+python3 main.py --dashboard
+# Opens http://localhost:7890
+```
+
+**Dashboard features:**
+- **Overview** — stats, quick scan, score history sparkline
+- **New Scan** — configure and run a single-domain audit
+- **Bulk Scan** — scan up to 10 domains simultaneously (competitor analysis)
+- **Monitor Mode** — schedule recurring scans (hourly, daily, weekly)
+- **Jobs** — real-time progress tracking
+- **Reports** — search, filter, view inline, download PDF
+- **Skills & AI** — model routing status, SkillOpt training
+- **Settings** — API key management, stored only in local `.env`
+- **Help** — quick reference guide
+
+---
+
+## Installation
+
+### From GitHub
 
 ```bash
 git clone https://github.com/teyfikoz/insight-agent.git
 cd insight-agent
 
-# Sanal ortam oluştur
 python3 -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate       # Windows: .venv\Scripts\activate.bat
 
-# Bağımlılıkları yükle
 pip install -r requirements.txt
-
-# (Opsiyonel) SkillOpt eğitim için
-pip install skillopt
 ```
 
-### B — USB Bellekten (offline kullanım)
+### USB Offline Mode
 
-USB bellekte şu yapı olmalı:
-
-```
-USB:/
-  insight-agent/          ← bu reponun kopyası
-  wheels/                 ← pip wheel'ları (offline kurulum için)
-    requirements_wheels/
-```
-
-**USB'den kurulum:**
+**Prepare USB on an internet-connected machine (one time):**
 ```bash
-# USB sürücünüzü bağlayın (örnek: /Volumes/INSIGHT)
-cd /Volumes/INSIGHT/insight-agent
-
-python3 -m venv .venv
-source .venv/bin/activate
-
-# İnternet olmadan kurulum (wheels klasöründen)
-pip install --no-index --find-links=/Volumes/INSIGHT/wheels/requirements_wheels -r requirements.txt
-
-# Çalıştır
-python3 main.py --target hedefsite.com --no-pdf
+git clone https://github.com/teyfikoz/insight-agent.git
+cd insight-agent
+./make_usb.sh /Volumes/MY_USB   # macOS
+# or
+./make_usb.sh /media/MY_USB     # Linux
 ```
 
-**USB için wheel'ları hazırlamak (internete bağlı makinede bir kez):**
-```bash
-mkdir -p wheels/requirements_wheels
-pip download -r requirements.txt -d wheels/requirements_wheels
+**Use on any offline machine:**
 ```
+USB:/InsightAgent/
+  ├── launch.command    ← macOS: double-click to start
+  ├── launch.bat        ← Windows: double-click to start
+  ├── wheels/           ← all Python packages (51 files, offline install)
+  └── ...
+```
+
+Double-clicking `launch.command` (Mac) or `launch.bat` (Windows):
+1. Creates a Python virtual environment automatically
+2. Installs all dependencies from the bundled wheels (no internet needed)
+3. Opens the dashboard at `http://localhost:7890`
 
 ---
 
-## API Anahtarları
+## Quick Start
 
-InsightAgent üç katmanlı fallback kullanır — en azından bir tanesi yeterli:
-
+### CLI
 ```bash
-# .env dosyası oluştur (proje kökünde)
-NVIDIA_NIM_API_KEY=nvapi-xxx   # Birincil — en iyi kalite
-GROQ_API_KEY=gsk_xxx           # İkincil — hızlı ve ücretsiz
-# İkisi de yoksa: rule-based fallback (API'siz çalışır)
+# Single scan — Markdown report
+python3 main.py --target example.com
+
+# PDF + Markdown report
+python3 main.py --target example.com --output ~/Desktop/reports/
+
+# No PDF (faster, useful offline)
+python3 main.py --target example.com --no-pdf
+
+# With target keywords
+python3 main.py --target example.com --keywords "saas, monitoring, uptime"
+
+# Continuous monitoring (scan every hour)
+python3 main.py --monitor example.com --interval 3600
 ```
 
-Anahtarları şuradan al:
-- NIM: https://integrate.api.nvidia.com (ücretsiz başlangıç kredisi)
-- Groq: https://console.groq.com (ücretsiz tier: 14,400 req/gün)
-
----
-
-## Kullanım
-
-### Temel tarama
-
+### Dashboard
 ```bash
-# Markdown raporu
-python3 main.py --target robocheckin.com
-
-# PDF + Markdown
-python3 main.py --target b2blife.com --output ~/Desktop/raporlar/
-
-# PDF olmadan (fpdf2 kurulu değilse)
-python3 main.py --target techsyncanalytica.com --no-pdf
-
-# Hedef keyword'lerle
-python3 main.py --target kredimplus.com --keywords "kredi hesaplama, faiz oranı, banka"
-
-# Sadece SEO raporu (hızlı)
-python3 main.py --target site.com --report seo
+python3 main.py --dashboard
+# → http://localhost:7890
 ```
 
-### Çıktı örneği
-
+### Example Output
 ```
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ InsightAgent — robocheckin.com ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-SEO Score      89/100   Grade: A
-Load Time      312ms    Fast ✓
-SSL            287 gün  ✓
-Schema         JSON-LD  ✓
-Critical Issues 0       None ✓
-AI Provider    NVIDIA NIM
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+│ InsightAgent — example.com       │
+└━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┘
+
+ Metric           Value            Status
+─────────────────────────────────────────
+ SEO Score        89/100           Grade: A
+ Load Time        472ms            Fast ✓
+ SSL              56 days          ✓
+ Sitemap          found            ✓
+ Schema           SoftwareApp      ✓
+ Critical Issues  0                None ✓
+ AI Provider      NVIDIA NIM       AI ✓
 
 Quick Wins:
-  → Canonical URL ekle (30 dk)
-  → Next.js generateMetadata kullan (1 saat)
-  → Meta description kısalt — 160 char (15 dk)
+  → Add canonical URL tag (30 min)
+  → Shorten title to under 60 chars (15 min)
+  → Add generateMetadata to all pages (1 hour)
+
+Markdown report: reports/example_com_20260804_120000.md
 ```
 
 ---
 
-## SkillOpt — Kendi Kendini Geliştiren Agentlar
+## API Keys (All Optional)
 
-InsightAgent, Microsoft'un [SkillOpt](https://github.com/microsoft/SkillOpt) framework'ünü kullanarak
-kendi analiz promptlarını zamanla iyileştirir. Model ağırlıkları değişmez; sadece `skills/*.md` dosyaları güncellenir.
+InsightAgent works without any API key. Keys unlock AI-powered insights:
 
-### Nasıl çalışır
+```bash
+# Create .env in the project folder
+NVIDIA_NIM_API_KEY=nvapi-...   # Best quality — free credits at signup
+GROQ_API_KEY=gsk_...           # Fast & free — 14,400 req/day
+GEMINI_API_KEY=AIza...         # 1M context — free at aistudio.google.com
+```
+
+Or set them through the **Settings** tab in the dashboard.
+
+| Provider | Model | Free Tier | Quality |
+|----------|-------|-----------|---------|
+| NVIDIA NIM | Llama 3.3 70B | Credits on signup | ⭐⭐⭐ Best |
+| Groq | Llama 3.3 70B | 14,400 req/day | ⭐⭐⭐ Fast |
+| Google Gemini | Gemini 2.0 Flash | 1M tokens/day | ⭐⭐ |
+| Rule-Based | Built-in | Always free | ⭐ Offline |
+
+---
+
+## Bulk Scan (Competitor Analysis)
+
+Scan multiple domains at once from the dashboard or CLI:
+
+**Dashboard:** Bulk Scan tab → paste domains (one per line) → Launch
+
+**CLI:** Run separate scans in background:
+```bash
+for domain in example.com competitor1.com competitor2.com; do
+  python3 main.py --target $domain --no-pdf &
+done
+wait
+```
+
+---
+
+## Monitor Mode
+
+Track a site's SEO over time:
+```bash
+# CLI: scan every 6 hours
+python3 main.py --monitor example.com --interval 21600
+
+# Dashboard: Monitor tab → set domain + interval → Start Monitoring
+```
+
+---
+
+## SkillOpt — Self-Improving AI
+
+InsightAgent uses SkillOpt (ReflACT loop) to improve its analysis prompts over time.
+The model weights never change — only the `skills/*.md` prompt files are updated.
 
 ```
 skills/
-  seo_auditor.md          ← başlangıç skill belgesi (tohum)
-  action_planner.md       ← başlangıç skill belgesi
+  seo_auditor.md          ← seed prompt
   seo_auditor/
-    best_skill.md         ← SkillOpt'un eğitip optimize ettiği versiyon
-                             (bu dosya varsa onu kullanır, yoksa seed'i kullanır)
+    best_skill.md         ← trained version (auto-updated by SkillOpt)
 ```
 
-### İlk eğitimi çalıştır
-
 ```bash
-# Hızlı test (2 epoch, 2 domain, ~5 dk)
-python3 skillopt_train.py --skill seo_auditor --epochs 2 --quick
+# Run training (improves SEO analysis quality)
+python3 skillopt_train.py --skill seo_auditor --epochs 3
 
-# Tam eğitim (5 epoch, 5 domain, ~20 dk)
-python3 skillopt_train.py --skill seo_auditor --epochs 5
-
-# Action planner eğitimi
-python3 skillopt_train.py --skill action_planner --epochs 3
-
-# Gecelik oto-evrim (her iki skill'i 2 epoch eğit)
-python3 skillopt_train.py --sleep
-```
-
-### Gecelik otomatik eğitim (cron)
-
-```bash
-# Her gece 02:00'de çalıştır
-crontab -e
-0 2 * * * cd /path/to/insight-agent && .venv/bin/python skillopt_train.py --sleep >> /tmp/skillopt_sleep.log 2>&1
-```
-
-### Eğitim sonucunu görme
-
-```bash
-# Hangi skill kullanılıyor?
-cat skills/seo_auditor/best_skill.md   # eğitilmiş versiyon
-
-# Eğitim geçmişi
-ls skillopt_runs/seo_auditor/          # epoch_01, epoch_02, ...
-
-# Anlık log
-tail -f /tmp/skillopt_sleep.log
+# Nightly cron: auto-train every night at 2am
+0 2 * * * cd /path/to/insight-agent && .venv/bin/python skillopt_train.py --sleep
 ```
 
 ---
 
-## Proje Yapısı
+## Project Structure
 
 ```
 insight-agent/
-├── main.py                    ← CLI giriş noktası
+├── main.py                    ← CLI entry point
 ├── requirements.txt
-├── skillopt_train.py          ← SkillOpt eğitim scripti
-├── .env                       ← API anahtarları (git'e commit edilmez)
+├── make_usb.sh                ← USB bundle creator
+├── launch.command             ← macOS launcher (double-click)
+├── launch.bat                 ← Windows launcher (double-click)
+├── skillopt_train.py          ← SkillOpt training
+├── .env                       ← API keys (git-ignored)
 │
 ├── agents/
-│   ├── base_agent.py          ← NIM → Groq → fallback router
-│   ├── seo_agent.py           ← SEO analizi
-│   ├── action_plan_agent.py   ← Aksiyon planı
-│   └── skill_loader.py        ← SkillOpt skill yükleyici
+│   ├── base_agent.py          ← NIM → Groq → Gemini → fallback router
+│   ├── seo_agent.py           ← SEO analysis
+│   ├── action_plan_agent.py   ← Action plan generator
+│   └── skill_loader.py        ← SkillOpt skill loader
 │
 ├── scanner/
-│   └── web_scanner.py         ← HTTP tarayıcı (SSL, meta, schema, perf)
+│   └── web_scanner.py         ← HTTP scanner (SSL, meta, schema, perf)
 │
 ├── reporter/
-│   ├── markdown_reporter.py   ← .md raporu
-│   └── pdf_reporter.py        ← .pdf raporu (fpdf2 gerekli)
+│   ├── markdown_reporter.py   ← .md report
+│   └── pdf_reporter.py        ← .pdf report (fpdf2)
+│
+├── dashboard/
+│   ├── server.py              ← FastAPI dashboard server
+│   └── templates/index.html  ← Single-page management panel
 │
 ├── skills/
-│   ├── seo_auditor.md         ← SEO skill (tohum)
-│   ├── action_planner.md      ← Aksiyon planı skill (tohum)
-│   └── seo_auditor/
-│       └── best_skill.md      ← Eğitilmiş artifact (otomatik güncellenir)
+│   ├── seo_auditor.md
+│   └── action_planner.md
 │
-├── reports/                   ← Oluşturulan raporlar
-└── skillopt_runs/             ← Eğitim geçmişi (git'e commit edilmez)
+└── reports/                   ← Generated reports (git-ignored)
 ```
 
 ---
 
-## USB Bellekte Taşıma Rehberi
+## Requirements
 
-Tamamen offline çalıştırmak istiyorsanız:
-
-### 1. Hazırlık (internete bağlı makinede)
-
-```bash
-# Repoyu klonla
-git clone https://github.com/teyfikoz/insight-agent.git
-
-# Wheel'ları indir
-cd insight-agent
-mkdir -p ../wheels
-pip download -r requirements.txt -d ../wheels
-pip download skillopt -d ../wheels
-
-# USB'ye kopyala
-cp -r insight-agent /Volumes/USB_ADI/
-cp -r wheels /Volumes/USB_ADI/
+```
+Python 3.10+
+requests, beautifulsoup4, lxml    — HTTP scanning
+openai                            — NIM + Groq + Gemini client
+fastapi, uvicorn                  — Dashboard server
+click, rich                       — CLI interface
+fpdf2                             — PDF generation
+httpx, feedparser                 — Extended data fetching
+pyyaml                            — Config
 ```
 
-### 2. USB'den kurulum (offline makinede)
-
-```bash
-cd /Volumes/USB_ADI/insight-agent
-
-python3 -m venv .venv
-source .venv/bin/activate
-
-pip install --no-index --find-links=/Volumes/USB_ADI/wheels -r requirements.txt
-pip install --no-index --find-links=/Volumes/USB_ADI/wheels skillopt
-
-# .env dosyası oluştur
-echo "GROQ_API_KEY=gsk_xxx" > .env
-
-# Çalıştır
-python3 main.py --target hedef.com --no-pdf
-```
-
-### 3. Raporu al
-
-Raporlar `reports/` klasörüne kaydedilir. USB bellekte taşıyabilirsiniz:
-
-```bash
-cp reports/*.md /Volumes/USB_ADI/raporlar/
-```
+All dependencies are bundled in the USB package (`wheels/` folder).
 
 ---
 
-## Bağımlılıklar
+## Privacy & Security
 
-```
-requests          ← HTTP tarama
-beautifulsoup4    ← HTML parse
-click             ← CLI
-rich              ← terminal UI
-fpdf2             ← PDF raporlama (opsiyonel)
-openai            ← NIM + Groq API istemcisi
-skillopt          ← self-evolving skill eğitimi (opsiyonel)
-```
+- **No telemetry.** InsightAgent never phones home.
+- **Local only.** All scans, reports, and API keys stay on your machine.
+- **API keys** are stored in `.env` — git-ignored by default, never logged.
+- **Offline mode** — works completely without internet when using USB bundle.
 
 ---
 
-## Lisans
+## License
 
-MIT — Özgürce kullanabilir, değiştirebilir ve dağıtabilirsiniz.
+MIT — Free to use, modify, and distribute.
 
 ---
 
-*InsightAgent, [TechSyncAnalytica](https://techsyncanalytica.com) portföyünün bir parçasıdır.*
+*Built with Python, FastAPI, NVIDIA NIM, Groq, and SkillOpt.*
+*Part of the [TechSyncAnalytica](https://techsyncanalytica.com) AI toolkit.*

@@ -6,615 +6,885 @@
 <title>InsightAgent — Management Dashboard</title>
 <style>
   :root {
-    --bg: #0f1117;
-    --panel: #1a1d27;
-    --panel2: #22263a;
-    --border: #2d3250;
-    --accent: #6c63ff;
-    --accent2: #00d4aa;
-    --text: #e8eaf6;
-    --muted: #8b90b4;
-    --red: #ff4d6d;
-    --yellow: #ffd166;
-    --green: #06d6a0;
-    --radius: 12px;
+    --bg:#0f1117; --panel:#1a1d27; --panel2:#22263a; --border:#2d3250;
+    --accent:#6c63ff; --accent2:#00d4aa; --text:#e8eaf6; --muted:#8b90b4;
+    --red:#ff4d6d; --yellow:#ffd166; --green:#06d6a0; --radius:12px;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; min-height:100vh; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
 
   /* Layout */
-  .layout { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+  .layout{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
 
   /* Sidebar */
-  .sidebar { background:var(--panel); border-right:1px solid var(--border); padding:24px 0; display:flex; flex-direction:column; }
-  .logo { padding:0 20px 24px; border-bottom:1px solid var(--border); }
-  .logo h1 { font-size:18px; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .logo p { font-size:11px; color:var(--muted); margin-top:3px; }
-  .nav { padding:16px 0; flex:1; }
-  .nav-item { display:flex; align-items:center; gap:10px; padding:10px 20px; cursor:pointer; color:var(--muted); font-size:13px; font-weight:500; transition:all .2s; border-left:2px solid transparent; }
-  .nav-item:hover { color:var(--text); background:var(--panel2); }
-  .nav-item.active { color:var(--accent); border-left-color:var(--accent); background:rgba(108,99,255,.08); }
-  .nav-item svg { width:16px; height:16px; flex-shrink:0; }
-  .sidebar-footer { padding:16px 20px; border-top:1px solid var(--border); }
-  .status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); display:inline-block; margin-right:6px; box-shadow:0 0 6px var(--green); }
-  .sidebar-footer p { font-size:11px; color:var(--muted); }
+  .sidebar{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column}
+  .logo{padding:20px;border-bottom:1px solid var(--border)}
+  .logo h1{font-size:17px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .logo p{font-size:11px;color:var(--muted);margin-top:2px}
+  .nav{padding:12px 0;flex:1;overflow-y:auto}
+  .nav-section{padding:8px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all .15s;border-left:2px solid transparent;user-select:none}
+  .nav-item:hover{color:var(--text);background:var(--panel2)}
+  .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(108,99,255,.08)}
+  .nav-item svg{width:15px;height:15px;flex-shrink:0}
+  .nav-badge{margin-left:auto;background:rgba(108,99,255,.2);color:var(--accent);font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px}
+  .nav-badge.green{background:rgba(6,214,160,.2);color:var(--green)}
+  .nav-badge.red{background:rgba(255,77,109,.2);color:var(--red)}
+
+  /* API status footer */
+  .sidebar-footer{padding:14px 16px;border-top:1px solid var(--border)}
+  .api-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:11px;color:var(--muted)}
+  .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .dot.on{background:var(--green);box-shadow:0 0 4px var(--green)}
+  .dot.off{background:var(--border)}
+  .dot.pulse{animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
   /* Main */
-  .main { padding:28px; overflow-y:auto; }
-  .page { display:none; }
-  .page.active { display:block; }
+  .main{padding:26px;overflow-y:auto;background:var(--bg)}
+  .page{display:none}
+  .page.active{display:block}
+  .page-header{margin-bottom:22px}
+  .page-header h2{font-size:21px;font-weight:700}
+  .page-header p{color:var(--muted);font-size:13px;margin-top:3px}
 
-  /* Header */
-  .page-header { margin-bottom:24px; }
-  .page-header h2 { font-size:22px; font-weight:700; }
-  .page-header p { color:var(--muted); font-size:13px; margin-top:4px; }
+  /* Stat cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+  .card-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+  .card-value{font-size:26px;font-weight:700}
+  .card-value.accent{color:var(--accent)}
+  .card-value.green{color:var(--green)}
+  .card-value.yellow{color:var(--yellow)}
+  .card-value.red{color:var(--red)}
+  .card-sub{font-size:11px;color:var(--muted);margin-top:3px}
 
-  /* Cards grid */
-  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:24px; }
-  .card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
-  .card-label { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:8px; }
-  .card-value { font-size:28px; font-weight:700; }
-  .card-value.accent { color:var(--accent); }
-  .card-value.green { color:var(--green); }
-  .card-value.yellow { color:var(--yellow); }
-  .card-sub { font-size:11px; color:var(--muted); margin-top:4px; }
+  /* Panels */
+  .panel-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px}
+  .panel-box h3{font-size:14px;font-weight:600;margin-bottom:14px}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .section-title{font-size:14px;font-weight:600;margin-bottom:12px}
 
-  /* Scan form */
-  .scan-box { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:24px; }
-  .scan-box h3 { font-size:15px; font-weight:600; margin-bottom:16px; }
-  .form-row { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:end; }
-  .form-group { display:flex; flex-direction:column; gap:6px; }
-  .form-group label { font-size:12px; color:var(--muted); font-weight:500; }
-  .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px; }
-  input, select {
-    background:var(--panel2); border:1px solid var(--border); border-radius:8px;
-    padding:10px 14px; color:var(--text); font-size:13px; outline:none; width:100%;
-    transition:border-color .2s;
-  }
-  input:focus, select:focus { border-color:var(--accent); }
-  .btn {
-    background:linear-gradient(135deg,var(--accent),#4f46e5); color:#fff;
-    border:none; border-radius:8px; padding:10px 24px; font-size:13px; font-weight:600;
-    cursor:pointer; transition:opacity .2s; white-space:nowrap;
-  }
-  .btn:hover { opacity:.88; }
-  .btn:disabled { opacity:.4; cursor:not-allowed; }
-  .btn-sm { padding:6px 14px; font-size:12px; }
-  .btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
-  .btn-outline:hover { border-color:var(--accent); color:var(--accent); opacity:1; }
+  /* Forms */
+  .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+  .form-group label{font-size:11px;color:var(--muted);font-weight:500}
+  .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  input,select,textarea{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;width:100%;transition:border-color .15s;font-family:inherit}
+  textarea{resize:vertical;min-height:100px}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  input[type=checkbox]{width:auto;accent-color:var(--accent)}
+  .flex{display:flex;align-items:center;gap:10px}
+  .flex-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 
-  /* Progress */
-  .job-card { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:12px; }
-  .job-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .job-target { font-size:14px; font-weight:600; }
-  .badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.06em; }
-  .badge.running { background:rgba(255,209,102,.15); color:var(--yellow); }
-  .badge.done { background:rgba(6,214,160,.15); color:var(--green); }
-  .badge.error { background:rgba(255,77,109,.15); color:var(--red); }
-  .badge.queued { background:rgba(108,99,255,.15); color:var(--accent); }
-  .progress-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin:8px 0; }
-  .progress-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .5s; }
-  .job-meta { font-size:11px; color:var(--muted); }
+  /* Buttons */
+  .btn{background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+  .btn:hover{opacity:.85}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+  .btn-sm{padding:5px 12px;font-size:12px}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);opacity:1}
+  .btn-red{background:linear-gradient(135deg,var(--red),#c62828)}
+  .btn-green{background:linear-gradient(135deg,var(--green),#00897b)}
 
-  /* Score ring */
-  .score-ring { display:inline-flex; flex-direction:column; align-items:center; }
-  .ring-wrap { position:relative; width:90px; height:90px; }
-  .ring-wrap svg { transform:rotate(-90deg); }
-  .ring-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; }
-  .ring-score { font-size:20px; font-weight:700; }
-  .ring-grade { font-size:11px; color:var(--muted); }
+  /* Job / progress cards */
+  .job-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+  .job-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+  .job-target{font-size:14px;font-weight:600}
+  .badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+  .badge.running{background:rgba(255,209,102,.15);color:var(--yellow)}
+  .badge.done{background:rgba(6,214,160,.15);color:var(--green)}
+  .badge.error{background:rgba(255,77,109,.15);color:var(--red)}
+  .badge.queued{background:rgba(108,99,255,.15);color:var(--accent)}
+  .badge.stopped{background:rgba(139,144,180,.15);color:var(--muted)}
+  .progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin:7px 0}
+  .progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+  .job-meta{font-size:11px;color:var(--muted)}
 
   /* Reports table */
-  .table-wrap { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-  table { width:100%; border-collapse:collapse; }
-  th { background:var(--panel2); padding:12px 16px; text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:600; }
-  td { padding:12px 16px; font-size:13px; border-top:1px solid var(--border); }
-  tr:hover td { background:rgba(108,99,255,.04); }
-  .domain-cell { font-weight:600; }
+  .table-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  th{background:var(--panel2);padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+  td{padding:10px 14px;font-size:13px;border-top:1px solid var(--border)}
+  tr:hover td{background:rgba(108,99,255,.04)}
+  .score-badge{display:inline-flex;align-items:center;justify-content:center;width:42px;height:22px;border-radius:6px;font-size:11px;font-weight:700}
+  .score-a{background:rgba(6,214,160,.15);color:var(--green)}
+  .score-b{background:rgba(255,209,102,.15);color:var(--yellow)}
+  .score-c{background:rgba(255,77,109,.15);color:var(--red)}
 
   /* Report viewer */
-  .report-viewer { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
-  .report-content { font-family:'Fira Mono','Courier New',monospace; font-size:12px; line-height:1.7; color:var(--text); white-space:pre-wrap; word-break:break-word; max-height:60vh; overflow-y:auto; }
+  .report-viewer{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-top:16px}
+  .report-content{font-family:'Fira Mono','Courier New',monospace;font-size:12px;line-height:1.75;white-space:pre-wrap;word-break:break-word;max-height:58vh;overflow-y:auto}
 
-  /* Output terminal */
-  .terminal { background:#0a0c14; border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Mono','Courier New',monospace; font-size:11px; color:#a8e6cf; white-space:pre-wrap; max-height:300px; overflow-y:auto; margin-top:12px; }
+  /* Terminal */
+  .terminal{background:#0a0c14;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'Fira Mono','Courier New',monospace;font-size:11px;color:#a8e6cf;white-space:pre-wrap;max-height:260px;overflow-y:auto;margin-top:10px}
 
-  /* Skill status */
-  .skill-card { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px; }
-  .skill-name { font-size:14px; font-weight:600; margin-bottom:4px; }
-  .skill-meta { font-size:11px; color:var(--muted); }
-  .pill { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; margin-left:8px; }
-  .pill.optimized { background:rgba(6,214,160,.15); color:var(--green); }
-  .pill.seed { background:rgba(255,209,102,.15); color:var(--yellow); }
+  /* Monitor cards */
+  .monitor-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .monitor-info{flex:1}
+  .monitor-domain{font-size:14px;font-weight:600}
+  .monitor-meta{font-size:11px;color:var(--muted);margin-top:3px}
 
-  /* Sections grid */
-  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-  @media(max-width:900px) { .two-col { grid-template-columns:1fr; } .layout { grid-template-columns:1fr; } .sidebar { display:none; } }
+  /* Skill cards */
+  .skill-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+  .skill-name{font-size:13px;font-weight:600;margin-bottom:3px}
+  .skill-meta{font-size:11px;color:var(--muted)}
+  .pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;margin-left:6px}
+  .pill.optimized{background:rgba(6,214,160,.15);color:var(--green)}
+  .pill.seed{background:rgba(255,209,102,.15);color:var(--yellow)}
+
+  /* Help section */
+  .help-block{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+  .help-block h4{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--accent2)}
+  .help-block code{background:rgba(108,99,255,.12);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:12px;font-family:'Fira Mono',monospace}
+  .help-block p,.help-block li{font-size:12px;color:var(--muted);line-height:1.7}
+  .help-block ul{padding-left:16px}
+
+  /* Score sparkline */
+  .sparkline-wrap{margin-top:10px}
+  .sparkline-svg{width:100%;height:50px}
 
   /* Toast */
-  .toast { position:fixed; bottom:24px; right:24px; background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px 20px; font-size:13px; z-index:999; transform:translateY(80px); opacity:0; transition:all .3s; pointer-events:none; }
-  .toast.show { transform:translateY(0); opacity:1; }
-  .toast.success { border-color:var(--green); color:var(--green); }
-  .toast.error { border-color:var(--red); color:var(--red); }
+  .toast{position:fixed;bottom:22px;right:22px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:11px 18px;font-size:13px;z-index:999;transform:translateY(70px);opacity:0;transition:all .25s;pointer-events:none}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:var(--green);color:var(--green)}
+  .toast.error{border-color:var(--red);color:var(--red)}
+  .toast.info{border-color:var(--accent);color:var(--accent)}
 
-  .empty { text-align:center; padding:40px; color:var(--muted); font-size:13px; }
-  .section-title { font-size:15px; font-weight:600; margin-bottom:14px; }
-  .flex { display:flex; align-items:center; gap:12px; }
-  .flex-between { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  hr { border:none; border-top:1px solid var(--border); margin:20px 0; }
+  .empty{text-align:center;padding:36px;color:var(--muted);font-size:13px}
+  hr{border:none;border-top:1px solid var(--border);margin:18px 0}
+
+  /* Batch results grid */
+  .batch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:16px}
+
+  /* Search input */
+  .search-input{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;width:220px}
+  .search-input:focus{border-color:var(--accent)}
+
+  @media(max-width:820px){
+    .layout{grid-template-columns:1fr}
+    .sidebar{display:none}
+    .two-col,.form-grid-3{grid-template-columns:1fr}
+  }
 </style>
 </head>
 <body>
-
 <div class="layout">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">
-      <h1>InsightAgent</h1>
-      <p>AI Website Intelligence v2.0</p>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="logo">
+    <h1>InsightAgent</h1>
+    <p>AI Website Intelligence v2.0</p>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" data-page="overview" onclick="nav(this,'overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Overview
     </div>
-    <nav class="nav">
-      <div class="nav-item active" onclick="showPage('overview')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Overview
-      </div>
-      <div class="nav-item" onclick="showPage('scan')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        New Scan
-      </div>
-      <div class="nav-item" onclick="showPage('jobs')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Active Jobs
-      </div>
-      <div class="nav-item" onclick="showPage('reports')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Reports
-      </div>
-      <div class="nav-item" onclick="showPage('skills')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        Skills &amp; AI
-      </div>
-      <div class="nav-item" onclick="showPage('settings')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Settings
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      <p><span class="status-dot"></span><span id="status-text">Starting...</span></p>
+    <div class="nav-item" data-page="scan" onclick="nav(this,'scan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      New Scan
     </div>
-  </aside>
+    <div class="nav-item" data-page="bulk" onclick="nav(this,'bulk')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Bulk Scan
+    </div>
+    <div class="nav-item" data-page="monitor" onclick="nav(this,'monitor')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Monitor
+      <span class="nav-badge green" id="monitor-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-section">Data</div>
+    <div class="nav-item" data-page="jobs" onclick="nav(this,'jobs')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Jobs
+      <span class="nav-badge" id="jobs-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-page="reports" onclick="nav(this,'reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Reports
+    </div>
+    <div class="nav-section">Config</div>
+    <div class="nav-item" data-page="skills" onclick="nav(this,'skills')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Skills &amp; AI
+    </div>
+    <div class="nav-item" data-page="settings" onclick="nav(this,'settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+    <div class="nav-item" data-page="help" onclick="nav(this,'help')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Help &amp; Guide
+    </div>
+  </nav>
+  <!-- API Status -->
+  <div class="sidebar-footer">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;font-weight:600">AI Providers</div>
+    <div class="api-row"><span>NVIDIA NIM</span><span class="dot off" id="dot-nim"></span></div>
+    <div class="api-row"><span>Groq</span><span class="dot off" id="dot-groq"></span></div>
+    <div class="api-row"><span>Gemini</span><span class="dot off" id="dot-gemini"></span></div>
+  </div>
+</aside>
 
-  <!-- Main content -->
-  <main class="main">
+<!-- ── Main ─────────────────────────────────────────────────────────────────── -->
+<main class="main">
 
-    <!-- Overview -->
-    <div class="page active" id="page-overview">
-      <div class="page-header">
-        <h2>Dashboard Overview</h2>
-        <p>AI-powered website intelligence — real-time audit &amp; strategy</p>
-      </div>
-      <div class="cards">
-        <div class="card">
-          <div class="card-label">Total Reports</div>
-          <div class="card-value accent" id="stat-reports">—</div>
-          <div class="card-sub">generated audits</div>
+<!-- Overview -->
+<div class="page active" id="page-overview">
+  <div class="page-header">
+    <h2>Dashboard Overview</h2>
+    <p>Real-time website intelligence — audits, trends, quick actions</p>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="card-label">Total Reports</div><div class="card-value accent" id="stat-reports">—</div><div class="card-sub">generated audits</div></div>
+    <div class="card"><div class="card-label">Active Scans</div><div class="card-value yellow" id="stat-jobs">0</div><div class="card-sub">running now</div></div>
+    <div class="card"><div class="card-label">Monitors</div><div class="card-value green" id="stat-monitors">0</div><div class="card-sub">active watchers</div></div>
+    <div class="card"><div class="card-label">AI Skill</div><div class="card-value" id="stat-skill" style="font-size:16px;margin-top:4px">—</div><div class="card-sub">optimization</div></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="panel-box" style="margin-bottom:0">
+        <h3>Quick Scan</h3>
+        <div class="form-group">
+          <label>Target URL or domain</label>
+          <input type="text" id="quick-target" placeholder="example.com or https://..." />
         </div>
-        <div class="card">
-          <div class="card-label">Active Scans</div>
-          <div class="card-value yellow" id="stat-jobs">0</div>
-          <div class="card-sub">running now</div>
-        </div>
-        <div class="card">
-          <div class="card-label">AI Skill</div>
-          <div class="card-value green" id="stat-skill">—</div>
-          <div class="card-sub">optimization status</div>
-        </div>
-        <div class="card">
-          <div class="card-label">Python</div>
-          <div class="card-value" id="stat-python" style="font-size:18px">—</div>
-          <div class="card-sub">runtime</div>
-        </div>
-      </div>
-
-      <div class="two-col">
-        <div class="scan-box" style="margin-bottom:0">
-          <h3>Quick Scan</h3>
-          <div class="form-group" style="margin-bottom:12px">
-            <label>Target URL / Domain</label>
-            <input type="text" id="quick-target" placeholder="example.com or https://..." />
-          </div>
+        <div class="flex">
           <button class="btn" onclick="quickScan()">Start Scan</button>
-        </div>
-        <div class="card" style="padding:24px">
-          <div class="section-title">Recent Reports</div>
-          <div id="recent-reports-list"><div class="empty">No reports yet</div></div>
+          <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" id="quick-nopdf" style="width:auto"> Skip PDF
+          </label>
         </div>
       </div>
     </div>
-
-    <!-- New Scan -->
-    <div class="page" id="page-scan">
-      <div class="page-header">
-        <h2>New Scan</h2>
-        <p>Configure and launch a full website intelligence audit</p>
+    <div>
+      <div class="panel-box" style="margin-bottom:0">
+        <div class="section-title">Recent Reports</div>
+        <div id="recent-list"><div class="empty" style="padding:16px">No reports yet</div></div>
+        <div id="score-chart-wrap" class="sparkline-wrap" style="display:none">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">SEO Score History</div>
+          <svg class="sparkline-svg" id="sparkline"></svg>
+        </div>
       </div>
-      <div class="scan-box">
-        <h3>Scan Configuration</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Target URL / Domain</label>
-            <input type="text" id="scan-target" placeholder="example.com" />
-          </div>
-          <div class="form-group">
-            <label>Report Type</label>
-            <select id="scan-type">
+    </div>
+  </div>
+</div>
+
+<!-- New Scan -->
+<div class="page" id="page-scan">
+  <div class="page-header"><h2>New Scan</h2><p>Full AI-powered website intelligence audit</p></div>
+  <div class="panel-box">
+    <h3>Scan Configuration</h3>
+    <div class="form-grid-3">
+      <div class="form-group" style="margin-bottom:0">
+        <label>Target URL / Domain</label>
+        <input type="text" id="scan-target" placeholder="example.com" />
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Report Type</label>
+        <select id="scan-type">
+          <option value="full">Full Report</option>
+          <option value="seo">SEO Only</option>
+          <option value="quick">Quick Scan</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Keywords (comma-separated)</label>
+        <input type="text" id="scan-keywords" placeholder="saas, monitoring, uptime" />
+      </div>
+    </div>
+    <div class="flex">
+      <button class="btn" id="scan-btn" onclick="startScan()">Launch Scan</button>
+      <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
+        <input type="checkbox" id="scan-nopdf" style="width:auto"> Skip PDF
+      </label>
+    </div>
+  </div>
+  <div id="scan-result-area" style="display:none">
+    <div class="job-card">
+      <div class="job-header">
+        <span class="job-target" id="scan-job-target">—</span>
+        <span class="badge queued" id="scan-job-badge">Queued</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="scan-progress-bar" style="width:0%"></div></div>
+      <div class="job-meta" id="scan-job-meta">Starting...</div>
+      <div class="terminal" id="scan-output" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Scan -->
+<div class="page" id="page-bulk">
+  <div class="page-header"><h2>Bulk Scan</h2><p>Scan up to 10 domains simultaneously — compare competitors, audit a portfolio</p></div>
+  <div class="panel-box">
+    <h3>Batch Configuration</h3>
+    <div class="form-group">
+      <label>Domains — one per line (or comma-separated, max 10)</label>
+      <textarea id="bulk-targets" placeholder="example.com&#10;competitor1.com&#10;competitor2.com&#10;mybusiness.com"></textarea>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group" style="margin-bottom:0">
+        <label>Report Type</label>
+        <select id="bulk-type">
+          <option value="full">Full Report</option>
+          <option value="seo">SEO Only</option>
+          <option value="quick">Quick Scan</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Keywords (optional, applies to all)</label>
+        <input type="text" id="bulk-keywords" placeholder="product, service, brand" />
+      </div>
+    </div>
+    <button class="btn" id="bulk-btn" onclick="startBulk()">Launch Bulk Scan</button>
+    <span style="font-size:11px;color:var(--muted);margin-left:10px" id="bulk-count-label"></span>
+  </div>
+  <div id="bulk-results" class="batch-grid"></div>
+</div>
+
+<!-- Monitor -->
+<div class="page" id="page-monitor">
+  <div class="page-header"><h2>Monitor Mode</h2><p>Schedule recurring scans — track SEO trends over time</p></div>
+  <div class="two-col">
+    <div>
+      <div class="panel-box">
+        <h3>Add Monitor</h3>
+        <div class="form-group">
+          <label>Target Domain</label>
+          <input type="text" id="mon-target" placeholder="example.com" />
+        </div>
+        <div class="form-group">
+          <label>Interval</label>
+          <select id="mon-interval">
+            <option value="3600">Every hour</option>
+            <option value="21600">Every 6 hours</option>
+            <option value="86400" selected>Every 24 hours</option>
+            <option value="604800">Every week</option>
+          </select>
+        </div>
+        <button class="btn btn-green" onclick="startMonitor()">Start Monitoring</button>
+      </div>
+    </div>
+    <div>
+      <div class="flex-between"><div class="section-title">Active Monitors</div><button class="btn btn-outline btn-sm" onclick="loadMonitors()">Refresh</button></div>
+      <div id="monitor-list"><div class="empty">No monitors running</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Jobs -->
+<div class="page" id="page-jobs">
+  <div class="flex-between">
+    <div class="page-header" style="margin-bottom:0"><h2>Jobs</h2><p>All scan jobs this session</p></div>
+    <button class="btn btn-outline btn-sm" onclick="loadJobs()">Refresh</button>
+  </div>
+  <br>
+  <div id="jobs-list"><div class="empty">No jobs yet</div></div>
+</div>
+
+<!-- Reports -->
+<div class="page" id="page-reports">
+  <div class="flex-between">
+    <div class="page-header" style="margin-bottom:0"><h2>Reports</h2><p>All generated audit reports</p></div>
+    <div class="flex">
+      <input type="text" class="search-input" id="report-search" placeholder="Filter by domain..." oninput="filterReports()">
+      <button class="btn btn-outline btn-sm" onclick="loadReports()">Refresh</button>
+    </div>
+  </div>
+  <br>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Domain</th><th>SEO Score</th><th>Created</th><th>Size</th><th>Actions</th></tr></thead>
+      <tbody id="reports-table-body"><tr><td colspan="5" class="empty">No reports yet</td></tr></tbody>
+    </table>
+  </div>
+  <div id="report-viewer" style="display:none">
+    <div class="flex-between" style="margin-top:16px">
+      <div class="section-title" id="viewer-title">—</div>
+      <div class="flex">
+        <button class="btn btn-outline btn-sm" id="viewer-download-btn" onclick="downloadReport()">Download PDF</button>
+        <button class="btn btn-outline btn-sm" onclick="closeViewer()">Close</button>
+      </div>
+    </div>
+    <div class="report-viewer"><div class="report-content" id="report-content"></div></div>
+  </div>
+</div>
+
+<!-- Skills & AI -->
+<div class="page" id="page-skills">
+  <div class="page-header"><h2>Skills &amp; AI</h2><p>Self-evolving agent skills and AI model routing</p></div>
+  <div class="two-col">
+    <div>
+      <div class="section-title">Active Skills</div>
+      <div class="skill-card">
+        <div class="skill-name">SEO Auditor <span class="pill" id="seo-skill-pill">checking…</span></div>
+        <div class="skill-meta">Title, meta, schema, Core Web Vitals, keyword density analysis</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">Action Planner <span class="pill seed">seed</span></div>
+        <div class="skill-meta">Generates 7/30/90-day action plans with ROI estimates</div>
+      </div>
+      <hr>
+      <div class="section-title">SkillOpt Training</div>
+      <div class="panel-box" style="margin-bottom:0">
+        <div class="card-label">Improve skills over time with ReflACT loop</div>
+        <br>
+        <code style="font-size:11px;color:var(--accent2);display:block;margin-bottom:8px;background:var(--bg);padding:8px;border-radius:6px">python3 skillopt_train.py --skill seo_auditor --epochs 3</code>
+        <div class="card-sub">Training writes to <code style="color:var(--accent);font-size:11px">skills/seo_auditor/best_skill.md</code> automatically.</div>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">AI Model Chain</div>
+      <div class="skill-card" style="border-color:rgba(0,212,170,.25)">
+        <div class="skill-name" style="color:var(--accent2)">1 — NVIDIA NIM</div>
+        <div class="skill-meta">meta/llama-3.3-70b-instruct · integrate.api.nvidia.com · Best quality</div>
+      </div>
+      <div class="skill-card" style="border-color:rgba(255,209,102,.2)">
+        <div class="skill-name" style="color:var(--yellow)">2 — Groq</div>
+        <div class="skill-meta">llama-3.3-70b-versatile · 14,400 req/day free · Fast fallback</div>
+      </div>
+      <div class="skill-card" style="border-color:rgba(108,99,255,.2)">
+        <div class="skill-name" style="color:var(--accent)">3 — Google Gemini</div>
+        <div class="skill-meta">gemini-2.0-flash · 1M context window · aistudio.google.com</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name" style="color:var(--green)">4 — Rule-Based (Offline)</div>
+        <div class="skill-meta">Always available · No API key · Works 100% offline on USB</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="page" id="page-settings">
+  <div class="page-header"><h2>Settings</h2><p>API keys stored only in local <code style="font-size:12px;color:var(--accent)">.env</code> — never uploaded</p></div>
+  <div class="two-col">
+    <div>
+      <div class="panel-box">
+        <h3>AI Provider Keys</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">All optional. Chain: NIM → Groq → Gemini → rule-based (offline always works)</p>
+        <div class="form-group">
+          <label>NVIDIA NIM API Key <span style="color:var(--accent2);font-size:10px">PRIMARY</span></label>
+          <input type="password" id="key-nim" placeholder="nvapi-..." />
+        </div>
+        <div class="form-group">
+          <label>Groq API Key <span style="color:var(--yellow);font-size:10px">SECONDARY · free tier</span></label>
+          <input type="password" id="key-groq" placeholder="gsk_..." />
+        </div>
+        <div class="form-group">
+          <label>Google Gemini API Key <span style="color:var(--muted);font-size:10px">TERTIARY</span></label>
+          <input type="password" id="key-gemini" placeholder="AIza..." />
+        </div>
+        <div class="flex">
+          <button class="btn" onclick="saveSettings()">Save to .env</button>
+          <button class="btn btn-outline btn-sm" onclick="loadSettings()">Reload</button>
+        </div>
+      </div>
+      <div class="panel-box" style="margin-bottom:0">
+        <h3>Scan Defaults</h3>
+        <div class="form-grid-2">
+          <div class="form-group" style="margin-bottom:0">
+            <label>Default Report Type</label>
+            <select id="default-report">
               <option value="full">Full Report</option>
               <option value="seo">SEO Only</option>
               <option value="quick">Quick Scan</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Keywords (comma-separated)</label>
-            <input type="text" id="scan-keywords" placeholder="saas, monitoring, uptime" />
+          <div class="form-group" style="margin-bottom:0">
+            <label>Scan Timeout (sec)</label>
+            <input type="number" id="scan-timeout" value="120" min="30" max="300" />
           </div>
         </div>
-        <div class="flex">
-          <button class="btn" id="scan-btn" onclick="startScan()">Launch Scan</button>
-          <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer">
-            <input type="checkbox" id="scan-nopdf" style="width:auto"> Skip PDF
-          </label>
-        </div>
-      </div>
-
-      <div id="scan-result-area" style="display:none">
-        <div class="job-card" id="scan-job-card">
-          <div class="job-header">
-            <span class="job-target" id="scan-job-target">—</span>
-            <span class="badge queued" id="scan-job-badge">Queued</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" id="scan-progress-bar" style="width:0%"></div></div>
-          <div class="job-meta" id="scan-job-meta">Starting...</div>
-          <div class="terminal" id="scan-output" style="display:none"></div>
-        </div>
+        <button class="btn btn-outline btn-sm" onclick="saveDefaults()" style="margin-top:12px">Save Defaults</button>
       </div>
     </div>
-
-    <!-- Active Jobs -->
-    <div class="page" id="page-jobs">
-      <div class="flex-between">
-        <div class="page-header" style="margin-bottom:0">
-          <h2>Active Jobs</h2>
-          <p>All scan jobs this session</p>
+    <div>
+      <div class="panel-box">
+        <h3>Get API Keys (Free)</h3>
+        <div class="skill-card">
+          <div class="skill-name" style="font-size:12px">NVIDIA NIM</div>
+          <div class="skill-meta">integrate.api.nvidia.com — free credits on signup, Llama 3.3 70B</div>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="loadJobs()">Refresh</button>
+        <div class="skill-card">
+          <div class="skill-name" style="font-size:12px">Groq</div>
+          <div class="skill-meta">console.groq.com — 14,400 free requests/day, fastest inference</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name" style="font-size:12px">Google Gemini</div>
+          <div class="skill-meta">aistudio.google.com — generous free tier, 1M token context</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name" style="font-size:12px;color:var(--green)">No Key Needed</div>
+          <div class="skill-meta">Rule-based fallback always works — perfect for offline USB use</div>
+        </div>
       </div>
-      <br>
-      <div id="jobs-list"><div class="empty">No jobs yet</div></div>
-    </div>
-
-    <!-- Reports -->
-    <div class="page" id="page-reports">
-      <div class="flex-between">
-        <div class="page-header" style="margin-bottom:0">
-          <h2>Reports</h2>
-          <p>All generated audit reports</p>
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="loadReports()">Refresh</button>
-      </div>
-      <br>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Domain</th><th>Created</th><th>Size</th><th>Action</th></tr></thead>
-          <tbody id="reports-table-body"><tr><td colspan="4" class="empty">No reports yet</td></tr></tbody>
-        </table>
-      </div>
-      <div id="report-viewer" style="display:none; margin-top:20px">
-        <div class="flex-between">
-          <div class="section-title" id="viewer-title">—</div>
-          <button class="btn btn-outline btn-sm" onclick="closeViewer()">Close</button>
-        </div>
-        <div class="report-viewer">
-          <div class="report-content" id="report-content"></div>
-        </div>
+      <div class="panel-box" style="margin-bottom:0">
+        <h3>Privacy</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7">Keys are stored only in <code style="color:var(--accent);font-size:11px">.env</code> on this device. Never uploaded, logged, or shared. The <code style="color:var(--accent);font-size:11px">.env</code> file is git-ignored by default.</p>
       </div>
     </div>
-
-    <!-- Skills & AI -->
-    <div class="page" id="page-skills">
-      <div class="page-header">
-        <h2>Skills &amp; AI Configuration</h2>
-        <p>SkillOpt self-evolving agent skills &amp; model routing</p>
-      </div>
-
-      <div class="two-col">
-        <div>
-          <div class="section-title">Active Skills</div>
-          <div style="display:flex;flex-direction:column;gap:12px" id="skills-list">
-            <div class="skill-card">
-              <div class="skill-name">SEO Auditor <span class="pill" id="seo-skill-pill">checking...</span></div>
-              <div class="skill-meta">Analyzes page structure, meta tags, schema, performance</div>
-            </div>
-            <div class="skill-card">
-              <div class="skill-name">Action Planner <span class="pill seed">seed</span></div>
-              <div class="skill-meta">Generates 7/30/90-day action plans with ROI estimates</div>
-            </div>
-          </div>
-          <br>
-          <div class="section-title">SkillOpt Training</div>
-          <div class="card">
-            <div class="card-label">Run training to improve skills over time</div>
-            <br>
-            <code style="font-size:11px;color:var(--accent2);display:block;margin-bottom:12px">
-              python3 skillopt_train.py --skill seo_auditor --epochs 3
-            </code>
-            <div class="card-sub">Training writes to skills/seo_auditor/best_skill.md automatically.</div>
-          </div>
-        </div>
-
-        <div>
-          <div class="section-title">AI Model Routing</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div class="skill-card">
-              <div class="skill-name" style="color:var(--accent2)">1. NVIDIA NIM</div>
-              <div class="skill-meta">meta/llama-3.3-70b-instruct — Primary, highest quality</div>
-            </div>
-            <div class="skill-card">
-              <div class="skill-name" style="color:var(--yellow)">2. Groq</div>
-              <div class="skill-meta">llama-3.3-70b-versatile — Fast fallback, 14,400 req/day free</div>
-            </div>
-            <div class="skill-card">
-              <div class="skill-name" style="color:var(--muted)">3. Rule-Based</div>
-              <div class="skill-meta">No API key needed — always available offline</div>
-            </div>
-          </div>
-          <br>
-          <div class="section-title">airllm (Offline LLM)</div>
-          <div class="card">
-            <div class="card-label">Run 70B models with 4GB RAM — no API key needed</div>
-            <br>
-            <code style="font-size:11px;color:var(--accent2);display:block">pip install airllm</code>
-            <div class="card-sub" style="margin-top:8px">Ideal for USB offline mode. First run downloads model (~4GB).</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </main>
+  </div>
 </div>
 
-    <!-- Settings -->
-    <div class="page" id="page-settings">
-      <div class="page-header">
-        <h2>Settings</h2>
-        <p>API keys — stored only in your local .env file, never sent anywhere</p>
+<!-- Help -->
+<div class="page" id="page-help">
+  <div class="page-header"><h2>Help &amp; Guide</h2><p>Quick reference for InsightAgent features</p></div>
+  <div class="two-col">
+    <div>
+      <div class="help-block">
+        <h4>Quick Start</h4>
+        <ol style="padding-left:16px;font-size:12px;color:var(--muted);line-height:2">
+          <li>Go to <b>Settings</b> → add a free Groq API key</li>
+          <li>Go to <b>New Scan</b> → enter a domain → Launch Scan</li>
+          <li>Wait ~30 seconds for the AI to complete analysis</li>
+          <li>View the report in <b>Reports</b> tab</li>
+        </ol>
       </div>
-
-      <div class="two-col">
-        <div>
-          <div class="scan-box" style="margin-bottom:16px">
-            <h3>AI Provider Keys</h3>
-            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">All keys optional. Fallback chain: NIM → Groq → Gemini → rule-based (always works offline)</p>
-            <div class="form-group" style="margin-bottom:12px">
-              <label>NVIDIA NIM API Key <span style="color:var(--accent2);font-size:10px">PRIMARY — best quality</span></label>
-              <input type="password" id="key-nim" placeholder="nvapi-..." />
-            </div>
-            <div class="form-group" style="margin-bottom:12px">
-              <label>Groq API Key <span style="color:var(--yellow);font-size:10px">SECONDARY — fast, free tier</span></label>
-              <input type="password" id="key-groq" placeholder="gsk_..." />
-            </div>
-            <div class="form-group" style="margin-bottom:16px">
-              <label>Google Gemini API Key <span style="color:var(--muted);font-size:10px">TERTIARY — 1M token context</span></label>
-              <input type="password" id="key-gemini" placeholder="AIza..." />
-            </div>
-            <div class="flex">
-              <button class="btn" onclick="saveSettings()">Save to .env</button>
-              <button class="btn btn-outline btn-sm" onclick="loadSettings()">Load current</button>
-            </div>
-          </div>
-
-          <div class="scan-box" style="margin-bottom:0">
-            <h3>Scan Defaults</h3>
-            <div class="form-grid" style="grid-template-columns:1fr 1fr">
-              <div class="form-group">
-                <label>Default Report Type</label>
-                <select id="default-report">
-                  <option value="full">Full Report</option>
-                  <option value="seo">SEO Only</option>
-                  <option value="quick">Quick Scan</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Scan Timeout (seconds)</label>
-                <input type="number" id="scan-timeout" value="120" min="30" max="300" />
-              </div>
-            </div>
-            <button class="btn btn-outline btn-sm" onclick="saveDefaults()" style="margin-top:12px">Save Defaults</button>
-          </div>
-        </div>
-
-        <div>
-          <div class="card" style="margin-bottom:16px">
-            <div class="section-title">API Key Guide</div>
-            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
-              <div class="skill-card">
-                <div class="skill-name" style="font-size:12px">NVIDIA NIM — Best Quality</div>
-                <div class="skill-meta">integrate.api.nvidia.com — free credits on signup</div>
-              </div>
-              <div class="skill-card">
-                <div class="skill-name" style="font-size:12px">Groq — Fast &amp; Free</div>
-                <div class="skill-meta">console.groq.com — 14,400 req/day free</div>
-              </div>
-              <div class="skill-card">
-                <div class="skill-name" style="font-size:12px">Google Gemini — Large Context</div>
-                <div class="skill-meta">aistudio.google.com — 1M token context window</div>
-              </div>
-              <div class="skill-card">
-                <div class="skill-name" style="font-size:12px;color:var(--green)">No Key — Always Works</div>
-                <div class="skill-meta">Rule-based fallback, 100% offline, no API needed</div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="section-title">Privacy</div>
-            <div class="card-sub" style="line-height:1.7">
-              Keys are stored only in <code style="color:var(--accent2);font-size:11px">.env</code> on this device.<br>
-              Never uploaded, logged, or shared.<br>
-              The <code style="color:var(--accent2);font-size:11px">.env</code> file is git-ignored by default.
-            </div>
-          </div>
-        </div>
+      <div class="help-block">
+        <h4>CLI Commands</h4>
+        <p style="margin-bottom:8px">You can also run InsightAgent from the terminal:</p>
+        <code>python3 main.py --target example.com</code><br><br>
+        <code>python3 main.py --target site.com --no-pdf</code><br><br>
+        <code>python3 main.py --target site.com --keywords "saas, uptime"</code><br><br>
+        <code>python3 main.py --monitor site.com --interval 3600</code>
+      </div>
+      <div class="help-block">
+        <h4>Bulk Scan Tips</h4>
+        <ul>
+          <li>Paste competitor domains to compare SEO scores side-by-side</li>
+          <li>Max 10 domains per batch — scans run in parallel</li>
+          <li>Results appear in <b>Jobs</b> and <b>Reports</b> as they complete</li>
+          <li>Best used with Groq or NIM key for AI-powered insights</li>
+        </ul>
       </div>
     </div>
+    <div>
+      <div class="help-block">
+        <h4>What InsightAgent Checks</h4>
+        <ul>
+          <li><b>SEO Score</b> — 0-100 composite score (A+ to F)</li>
+          <li><b>Title &amp; Meta</b> — length, keywords, uniqueness</li>
+          <li><b>H1/H2 structure</b> — heading hierarchy</li>
+          <li><b>SSL certificate</b> — validity, expiry days</li>
+          <li><b>Load time</b> — target under 1500ms</li>
+          <li><b>Sitemap &amp; robots.txt</b> — crawler accessibility</li>
+          <li><b>Schema markup</b> — JSON-LD rich snippets</li>
+          <li><b>Open Graph</b> — social sharing metadata</li>
+          <li><b>Tech stack</b> — Next.js, React, Cloudflare, etc.</li>
+          <li><b>Images alt text</b> — accessibility &amp; SEO</li>
+        </ul>
+      </div>
+      <div class="help-block">
+        <h4>AI Providers Setup</h4>
+        <ul>
+          <li><b>Offline mode:</b> No keys needed — rule-based analysis always runs</li>
+          <li><b>Best results:</b> Add NVIDIA NIM key (free credits at signup)</li>
+          <li><b>Free &amp; fast:</b> Groq gives 14,400 free requests/day</li>
+          <li>Keys are saved to <code>.env</code> in the app folder</li>
+        </ul>
+      </div>
+      <div class="help-block">
+        <h4>Monitor Mode</h4>
+        <ul>
+          <li>Set a domain + interval to auto-scan on schedule</li>
+          <li>Minimum interval: 5 minutes (300 seconds)</li>
+          <li>All scan results saved to <b>Reports</b> with timestamps</li>
+          <li>Stop any monitor from the Monitor page</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main><!-- /.main -->
+</div><!-- /.layout -->
 
 <div class="toast" id="toast"></div>
 
+<!-- ── JavaScript ─────────────────────────────────────────────────────────── -->
 <script>
 let currentJobId = null;
-let pollInterval = null;
+let pollTimer = null;
+let allReports = [];
+let currentViewerFile = null;
 
 // Navigation
-function showPage(name) {
+function nav(el, page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  event.currentTarget.classList.add('active');
-  if (name === 'reports') loadReports();
-  if (name === 'jobs') loadJobs();
-  if (name === 'skills') loadSkillStatus();
-  if (name === 'overview') loadOverview();
-  if (name === 'settings') loadSettings();
+  document.getElementById('page-' + page).classList.add('active');
+  el.classList.add('active');
+  const actions = {
+    overview: loadOverview,
+    reports: loadReports,
+    jobs: loadJobs,
+    skills: loadSkillStatus,
+    settings: loadSettings,
+    monitor: loadMonitors,
+    bulk: () => updateBulkCount(),
+  };
+  if (actions[page]) actions[page]();
 }
 
-function toast(msg, type='success') {
+function toast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show ' + type;
-  setTimeout(() => t.className = 'toast', 2800);
+  setTimeout(() => t.className = 'toast', 3000);
 }
 
-// Status
+// Status & API dots
 async function loadStatus() {
   try {
-    const r = await fetch('/api/status');
-    const d = await r.json();
-    document.getElementById('status-text').textContent = `v${d.version} · ${d.reports_count} reports`;
+    const d = await fetch('/api/status').then(r => r.json());
     document.getElementById('stat-reports').textContent = d.reports_count;
     document.getElementById('stat-jobs').textContent = d.active_jobs;
-    document.getElementById('stat-skill').textContent = d.has_optimized_skill ? 'Optimized' : 'Seed';
-    document.getElementById('stat-python').textContent = d.python;
-  } catch(e) {
-    document.getElementById('status-text').textContent = 'Server starting...';
-  }
+    document.getElementById('stat-monitors').textContent = d.monitors_active || 0;
+    document.getElementById('stat-skill').textContent = d.has_optimized_skill ? 'Optimized ✓' : 'Seed';
+
+    // API dots
+    ['nim','groq','gemini'].forEach(k => {
+      const dot = document.getElementById('dot-' + k);
+      dot.className = 'dot ' + (d['api_' + k] ? 'on' : 'off');
+    });
+
+    // Badges
+    const jb = document.getElementById('jobs-badge');
+    if (d.active_jobs > 0) { jb.textContent = d.active_jobs; jb.style.display = ''; }
+    else { jb.style.display = 'none'; }
+
+    const mb = document.getElementById('monitor-badge');
+    if ((d.monitors_active || 0) > 0) { mb.textContent = d.monitors_active; mb.style.display = ''; }
+    else { mb.style.display = 'none'; }
+  } catch {}
 }
 
+// Overview
 async function loadOverview() {
   await loadStatus();
-  const r = await fetch('/api/reports');
-  const reports = await r.json();
-  const el = document.getElementById('recent-reports-list');
-  if (!reports.length) { el.innerHTML = '<div class="empty">No reports yet</div>'; return; }
-  el.innerHTML = reports.slice(0,4).map(rep => `
+  allReports = await fetch('/api/reports').then(r => r.json());
+  const el = document.getElementById('recent-list');
+  if (!allReports.length) { el.innerHTML = '<div class="empty" style="padding:16px">No reports yet. Run your first scan!</div>'; return; }
+  el.innerHTML = allReports.slice(0, 4).map(r => `
     <div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div style="font-size:13px;font-weight:600">${rep.domain}</div>
-        <div style="font-size:11px;color:var(--muted)">${rep.created}</div>
+        <div style="font-size:13px;font-weight:600">${r.domain}</div>
+        <div style="font-size:11px;color:var(--muted)">${r.created}</div>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="openReport('${rep.filename}')">View</button>
+      <div class="flex" style="gap:6px">
+        ${r.score != null ? scoreBadge(r.score) : ''}
+        <button class="btn btn-outline btn-sm" onclick="openReport('${r.filename}')">View</button>
+      </div>
     </div>
   `).join('');
+  drawSparkline(allReports.slice(0, 10).reverse().filter(r => r.score != null));
 }
 
-// Quick scan from overview
+function scoreBadge(score) {
+  const cls = score >= 75 ? 'score-a' : score >= 50 ? 'score-b' : 'score-c';
+  return `<span class="score-badge ${cls}">${score}</span>`;
+}
+
+function drawSparkline(data) {
+  if (data.length < 2) return;
+  document.getElementById('score-chart-wrap').style.display = 'block';
+  const svg = document.getElementById('sparkline');
+  const scores = data.map(r => r.score);
+  const min = Math.min(...scores) - 5;
+  const max = Math.max(...scores) + 5;
+  const W = 400, H = 50;
+  const pts = scores.map((s, i) => {
+    const x = (i / (scores.length - 1)) * W;
+    const y = H - ((s - min) / (max - min)) * H;
+    return `${x},${y}`;
+  }).join(' ');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
+    ${scores.map((s, i) => {
+      const x = (i / (scores.length - 1)) * W;
+      const y = H - ((s - min) / (max - min)) * H;
+      return `<circle cx="${x}" cy="${y}" r="3" fill="var(--accent2)"/><title>${data[i].domain}: ${s}/100</title>`;
+    }).join('')}
+  `;
+}
+
+// Quick scan
 function quickScan() {
-  const target = document.getElementById('quick-target').value.trim();
-  if (!target) { toast('Enter a target domain', 'error'); return; }
-  document.getElementById('scan-target').value = target;
-  document.querySelector('.nav-item[onclick*="scan"]').click();
-  setTimeout(startScan, 100);
+  const t = document.getElementById('quick-target').value.trim();
+  if (!t) { toast('Enter a target domain', 'error'); return; }
+  document.getElementById('scan-target').value = t;
+  document.getElementById('scan-nopdf').checked = document.getElementById('quick-nopdf').checked;
+  document.querySelector('[data-page="scan"]').click();
+  setTimeout(startScan, 80);
 }
 
-// Scan
+// Single scan
 async function startScan() {
   const target = document.getElementById('scan-target').value.trim();
   if (!target) { toast('Enter a target domain', 'error'); return; }
-
   const btn = document.getElementById('scan-btn');
-  btn.disabled = true;
-  btn.textContent = 'Scanning...';
-
+  btn.disabled = true; btn.textContent = 'Scanning…';
   const payload = {
     target,
     report_type: document.getElementById('scan-type').value,
     keywords: document.getElementById('scan-keywords').value,
     no_pdf: document.getElementById('scan-nopdf').checked,
   };
-
-  const r = await fetch('/api/scan', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-  const d = await r.json();
+  const d = await fetch('/api/scan', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
   currentJobId = d.job_id;
-
   document.getElementById('scan-result-area').style.display = 'block';
   document.getElementById('scan-job-target').textContent = target;
   document.getElementById('scan-output').style.display = 'none';
-
-  if (pollInterval) clearInterval(pollInterval);
-  pollInterval = setInterval(pollJob, 1500);
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(() => pollJob(currentJobId, 'scan'), 1500);
 }
 
-async function pollJob() {
-  if (!currentJobId) return;
-  const r = await fetch('/api/job/' + currentJobId);
-  const job = await r.json();
-
-  const badge = document.getElementById('scan-job-badge');
-  const bar = document.getElementById('scan-progress-bar');
-  const meta = document.getElementById('scan-job-meta');
-  const output = document.getElementById('scan-output');
-  const btn = document.getElementById('scan-btn');
-
-  badge.textContent = job.status.toUpperCase();
-  badge.className = 'badge ' + job.status;
-
-  if (job.status === 'running') { bar.style.width = '60%'; }
-  else if (job.status === 'done') { bar.style.width = '100%'; }
-  else if (job.status === 'error') { bar.style.width = '100%'; bar.style.background = 'var(--red)'; }
-
-  meta.textContent = `${job.progress} · Started ${job.started_at}` + (job.finished_at ? ` · Finished ${job.finished_at}` : '');
-
-  if (job.output) {
-    output.style.display = 'block';
-    output.textContent = job.output.slice(-2000);
-    output.scrollTop = output.scrollHeight;
+async function pollJob(jobId, context) {
+  const job = await fetch('/api/job/' + jobId).then(r => r.json());
+  if (context === 'scan') {
+    document.getElementById('scan-job-badge').textContent = job.status.toUpperCase();
+    document.getElementById('scan-job-badge').className = 'badge ' + job.status;
+    const bar = document.getElementById('scan-progress-bar');
+    if (job.status === 'running') bar.style.width = '60%';
+    else if (job.status === 'done') bar.style.width = '100%';
+    else if (job.status === 'error') { bar.style.width = '100%'; bar.style.background = 'var(--red)'; }
+    document.getElementById('scan-job-meta').textContent = `${job.progress} · ${job.started_at}${job.finished_at ? ' → ' + job.finished_at : ''}`;
+    if (job.output) {
+      const out = document.getElementById('scan-output');
+      out.style.display = 'block';
+      out.textContent = job.output.slice(-2000);
+      out.scrollTop = out.scrollHeight;
+    }
+    if (job.status === 'done' || job.status === 'error') {
+      clearInterval(pollTimer);
+      document.getElementById('scan-btn').disabled = false;
+      document.getElementById('scan-btn').textContent = 'Launch Scan';
+      toast(job.status === 'done' ? (job.score ? `Done — SEO Score: ${job.score}/100` : 'Scan complete!') : 'Scan failed', job.status === 'done' ? 'success' : 'error');
+      loadStatus();
+    }
   }
+  return job;
+}
 
-  if (job.status === 'done' || job.status === 'error') {
-    clearInterval(pollInterval);
-    btn.disabled = false;
-    btn.textContent = 'Launch Scan';
-    const msg = job.status === 'done'
-      ? (job.score ? `Scan done — SEO Score: ${job.score}/100` : 'Scan completed!')
-      : 'Scan failed';
-    toast(msg, job.status === 'done' ? 'success' : 'error');
-    loadStatus();
-  }
+// Bulk scan
+function updateBulkCount() {
+  const lines = document.getElementById('bulk-targets')?.value.split('\n').filter(l => l.trim()).length || 0;
+  const lbl = document.getElementById('bulk-count-label');
+  if (lbl) lbl.textContent = lines > 0 ? `${Math.min(lines, 10)} domain(s) queued` : '';
+}
+
+async function startBulk() {
+  const targets = document.getElementById('bulk-targets').value;
+  if (!targets.trim()) { toast('Enter at least one domain', 'error'); return; }
+  const btn = document.getElementById('bulk-btn');
+  btn.disabled = true; btn.textContent = 'Launching…';
+  const payload = {
+    targets,
+    report_type: document.getElementById('bulk-type').value,
+    keywords: document.getElementById('bulk-keywords').value,
+  };
+  const d = await fetch('/api/scan/batch', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
+  if (d.error) { toast(d.error, 'error'); btn.disabled = false; btn.textContent = 'Launch Bulk Scan'; return; }
+  toast(`${d.count} scans started!`, 'info');
+  btn.disabled = false; btn.textContent = 'Launch Bulk Scan';
+  // Render job cards
+  const grid = document.getElementById('bulk-results');
+  grid.innerHTML = d.job_ids.map(jid => `
+    <div class="job-card" id="bulk-job-${jid}">
+      <div class="job-header">
+        <span class="job-target" id="bulk-t-${jid}">Loading…</span>
+        <span class="badge queued" id="bulk-b-${jid}">QUEUED</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="bulk-p-${jid}" style="width:5%"></div></div>
+      <div class="job-meta" id="bulk-m-${jid}">Waiting…</div>
+    </div>
+  `).join('');
+  // Poll all
+  d.job_ids.forEach(jid => pollBulkJob(jid));
+}
+
+async function pollBulkJob(jid) {
+  const poll = setInterval(async () => {
+    const job = await fetch('/api/job/' + jid).then(r => r.json());
+    const t = document.getElementById('bulk-t-' + jid);
+    const b = document.getElementById('bulk-b-' + jid);
+    const p = document.getElementById('bulk-p-' + jid);
+    const m = document.getElementById('bulk-m-' + jid);
+    if (!t) { clearInterval(poll); return; }
+    if (t) t.textContent = job.target;
+    if (b) { b.textContent = job.status.toUpperCase(); b.className = 'badge ' + job.status; }
+    if (p) p.style.width = job.status === 'done' ? '100%' : job.status === 'running' ? '60%' : '10%';
+    if (m) m.innerHTML = job.progress + (job.score ? ` · SEO Score: <strong>${job.score}/100</strong>` : '');
+    if (job.status === 'done' || job.status === 'error') {
+      clearInterval(poll);
+      loadStatus();
+    }
+  }, 2000);
+}
+
+// Monitor
+async function startMonitor() {
+  const target = document.getElementById('mon-target').value.trim();
+  if (!target) { toast('Enter a target domain', 'error'); return; }
+  const interval = parseInt(document.getElementById('mon-interval').value);
+  const d = await fetch('/api/monitor/start', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ target, interval }) }).then(r => r.json());
+  if (d.status === 'started') { toast(`Monitor started: ${target}`, 'success'); loadMonitors(); loadStatus(); }
+  else toast(d.error || 'Failed', 'error');
+}
+
+async function stopMonitor(target) {
+  await fetch('/api/monitor/stop', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ target }) });
+  toast(`Monitor stopped: ${target}`);
+  loadMonitors(); loadStatus();
+}
+
+async function loadMonitors() {
+  const monitors = await fetch('/api/monitor/list').then(r => r.json());
+  const el = document.getElementById('monitor-list');
+  if (!monitors.length) { el.innerHTML = '<div class="empty">No monitors running</div>'; return; }
+  el.innerHTML = monitors.map(m => `
+    <div class="monitor-card">
+      <div class="monitor-info">
+        <div class="monitor-domain">${m.target}</div>
+        <div class="monitor-meta">
+          Interval: ${fmtInterval(m.interval)} · Scans: ${m.scan_count}
+          ${m.last_scan ? ' · Last: ' + m.last_scan : ' · First scan pending'}
+        </div>
+      </div>
+      <div class="flex" style="gap:8px;flex-shrink:0">
+        <span class="badge ${m.status}">${m.status.toUpperCase()}</span>
+        ${m.status === 'running' ? `<button class="btn btn-red btn-sm" onclick="stopMonitor('${m.target}')">Stop</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function fmtInterval(s) {
+  if (s >= 86400) return (s/86400|0) + 'd';
+  if (s >= 3600) return (s/3600|0) + 'h';
+  return (s/60|0) + 'm';
 }
 
 // Jobs
 async function loadJobs() {
-  const r = await fetch('/api/jobs');
-  const jobs = await r.json();
+  const jobs = await fetch('/api/jobs').then(r => r.json());
   const el = document.getElementById('jobs-list');
   if (!jobs.length) { el.innerHTML = '<div class="empty">No jobs this session</div>'; return; }
-  el.innerHTML = jobs.reverse().map(job => `
+  el.innerHTML = jobs.slice().reverse().map(job => `
     <div class="job-card">
       <div class="job-header">
         <span class="job-target">${job.target}</span>
         <span class="badge ${job.status}">${job.status.toUpperCase()}</span>
       </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${job.status==='done'?'100':job.status==='running'?'60':job.status==='error'?'100':'10'}%"></div></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${job.status==='done'?'100':job.status==='running'?'60':job.status==='error'?'100':'10'}%${job.status==='error'?';background:var(--red)':''}"></div></div>
       <div class="job-meta">
-        Job #${job.id} · Started ${job.started_at}${job.finished_at?' · Finished '+job.finished_at:''}
-        ${job.score ? ' · SEO Score: <strong>'+job.score+'/100</strong>' : ''}
+        #${job.id} · ${job.started_at}${job.finished_at ? ' → ' + job.finished_at : ''}
+        ${job.score != null ? ` · SEO Score: <strong>${job.score}/100</strong>` : ''}
       </div>
     </div>
   `).join('');
@@ -622,39 +892,63 @@ async function loadJobs() {
 
 // Reports
 async function loadReports() {
-  const r = await fetch('/api/reports');
-  const reports = await r.json();
+  allReports = await fetch('/api/reports').then(r => r.json());
+  renderReports(allReports);
+}
+
+function renderReports(reports) {
   const tbody = document.getElementById('reports-table-body');
-  if (!reports.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">No reports yet</td></tr>'; return; }
-  tbody.innerHTML = reports.map(rep => `
+  if (!reports.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No reports yet</td></tr>'; return; }
+  tbody.innerHTML = reports.map(r => `
     <tr>
-      <td class="domain-cell">${rep.domain}</td>
-      <td>${rep.created}</td>
-      <td>${rep.size_kb} KB</td>
+      <td style="font-weight:600">${r.domain}</td>
+      <td>${r.score != null ? scoreBadge(r.score) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${r.created}</td>
+      <td>${r.size_kb} KB</td>
       <td>
-        <button class="btn btn-outline btn-sm" onclick="openReport('${rep.filename}')">View</button>
+        <div class="flex" style="gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="openReport('${r.filename}')">View</button>
+          ${r.has_pdf ? `<button class="btn btn-outline btn-sm" onclick="dlReport('${r.filename}')">PDF</button>` : ''}
+        </div>
       </td>
     </tr>
   `).join('');
 }
 
+function filterReports() {
+  const q = document.getElementById('report-search').value.toLowerCase();
+  renderReports(allReports.filter(r => r.domain.toLowerCase().includes(q)));
+}
+
 async function openReport(filename) {
-  const r = await fetch('/api/report/' + filename);
-  const d = await r.json();
+  const d = await fetch('/api/report/' + filename).then(r => r.json());
+  currentViewerFile = filename;
   document.getElementById('viewer-title').textContent = filename;
   document.getElementById('report-content').textContent = d.content;
-  document.getElementById('report-viewer').style.display = 'block';
-  document.getElementById('report-viewer').scrollIntoView({behavior:'smooth'});
+  const viewer = document.getElementById('report-viewer');
+  const dlBtn = document.getElementById('viewer-download-btn');
+  const rep = allReports.find(r => r.filename === filename);
+  dlBtn.style.display = rep?.has_pdf ? '' : 'none';
+  viewer.style.display = 'block';
+  viewer.scrollIntoView({ behavior: 'smooth' });
 }
 
 function closeViewer() {
   document.getElementById('report-viewer').style.display = 'none';
+  currentViewerFile = null;
+}
+
+function downloadReport() {
+  if (currentViewerFile) window.open('/api/report/' + currentViewerFile + '/download', '_blank');
+}
+
+function dlReport(filename) {
+  window.open('/api/report/' + filename + '/download', '_blank');
 }
 
 // Skills
 async function loadSkillStatus() {
-  const r = await fetch('/api/status');
-  const d = await r.json();
+  const d = await fetch('/api/status').then(r => r.json());
   const pill = document.getElementById('seo-skill-pill');
   pill.textContent = d.has_optimized_skill ? 'optimized' : 'seed';
   pill.className = 'pill ' + (d.has_optimized_skill ? 'optimized' : 'seed');
@@ -662,9 +956,7 @@ async function loadSkillStatus() {
 
 // Settings
 async function loadSettings() {
-  const r = await fetch('/api/settings');
-  if (!r.ok) return;
-  const d = await r.json();
+  const d = await fetch('/api/settings').then(r => r.json());
   if (d.NVIDIA_NIM_API_KEY) document.getElementById('key-nim').value = d.NVIDIA_NIM_API_KEY;
   if (d.GROQ_API_KEY) document.getElementById('key-groq').value = d.GROQ_API_KEY;
   if (d.GEMINI_API_KEY) document.getElementById('key-gemini').value = d.GEMINI_API_KEY;
@@ -678,9 +970,9 @@ async function saveSettings() {
     GROQ_API_KEY: document.getElementById('key-groq').value.trim(),
     GEMINI_API_KEY: document.getElementById('key-gemini').value.trim(),
   };
-  const r = await fetch('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
-  const d = await r.json();
+  const d = await fetch('/api/settings', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
   toast(d.message || 'Saved!', d.status === 'ok' ? 'success' : 'error');
+  loadStatus();
 }
 
 async function saveDefaults() {
@@ -688,15 +980,20 @@ async function saveDefaults() {
     DEFAULT_REPORT: document.getElementById('default-report').value,
     SCAN_TIMEOUT: document.getElementById('scan-timeout').value,
   };
-  const r = await fetch('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
-  const d = await r.json();
+  const d = await fetch('/api/settings', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
   toast(d.message || 'Saved!', d.status === 'ok' ? 'success' : 'error');
 }
+
+// Bulk textarea listener
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('bulk-targets');
+  if (ta) ta.addEventListener('input', updateBulkCount);
+});
 
 // Init
 loadStatus();
 loadOverview();
-setInterval(loadStatus, 10000);
+setInterval(loadStatus, 8000);
 </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 # InsightAgent v2.0 — NotebookLM Update
-**Date:** Aug 3, 2026 | **Commit:** ad15a07
+**Date:** Aug 3, 2026 | **Commit:** 2843103
 
 ## Yeni Özellikler (v2.0)
 
@@ -94,9 +94,26 @@ ssh -i ~/.ssh/id_ed25519 root@46.62.164.198 \
 
 ---
 
+## Test Sonuçları — Aug 3, 2026 (commit 2843103)
+
+| Test | Durum | Detay |
+|------|-------|-------|
+| `import httpx, feedparser, fastapi, groq` | ✅ | Tüm bağımlılıklar OK |
+| `python3 main.py --target robocheckin.com --no-pdf` | ✅ | SEO 89/100, AI=NVIDIA NIM, 472ms load |
+| Dashboard `/api/status` | ✅ | 200, version 2.0.0 |
+| Dashboard `/api/settings` | ✅ | 200 |
+| Dashboard `/api/reports` | ✅ | 200, 3 rapor |
+| Dashboard `/api/jobs` | ✅ | 200 |
+| `make_usb.sh /tmp/test_usb` | ✅ | 51 wheels, launch.command + launch.bat |
+
+### Düzeltilen Hatalar
+- **requirements.txt:** `httpx>=0.24.0` ve `feedparser>=6.0.0` eklendi (kurulu ama pin'lenmemişti)
+- **make_usb.sh:** `pip` → `python3 -m pip` (macOS'ta `pip` PATH'te yok, wheels=0 bug'ı düzeldi)
+- **make_usb.sh:** `2>/dev/null` → `--quiet` ile değiştirildi (gerçek hatalar görünür oldu)
+
 ## Sonraki Adımlar
 1. ✅ Gemini API fallback test et (Settings page üzerinden)
-2. ✅ USB packager test et (`make_usb.sh /tmp/test_usb`)
+2. ✅ USB packager test et (`make_usb.sh /tmp/test_usb`) — **51 wheels OK**
 3. ✅ Monitor mode test et (periyodik tarama)
 4. ⏳ Gumroad ürün sayfası oluştur ($29, USB delivery)
 5. ⏳ SkillOpt eğitim loop'unu production'da çalıştır
