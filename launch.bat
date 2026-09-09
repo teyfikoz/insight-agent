@@ -23,15 +23,26 @@ if errorlevel 1 (
 if not exist ".venv" (
     echo Setting up environment (first run)...
     python -m venv .venv
+    if errorlevel 1 exit /b 1
+)
 
-    if exist "..\wheels" (
+.venv\Scripts\python -c "import fastapi, uvicorn, click, rich, requests, bs4, lxml, openai, groq, fpdf, yaml, whois, dns, certifi, multipart, httpx, feedparser" >nul 2>&1
+if errorlevel 1 (
+
+    if exist "wheels" (
+        echo Installing from compatible local wheels...
+        .venv\Scripts\pip install --quiet --no-index --find-links="wheels" -r requirements.txt
+    ) else if exist "..\wheels" (
         echo Installing from USB wheels (offline mode)...
         .venv\Scripts\pip install --quiet --no-index --find-links="..\wheels" -r requirements.txt
-        .venv\Scripts\pip install --quiet --no-index --find-links="..\wheels" fastapi uvicorn python-multipart 2>nul
     ) else (
         echo Installing from internet...
         .venv\Scripts\pip install --quiet -r requirements.txt
-        .venv\Scripts\pip install --quiet fastapi uvicorn python-multipart
+    )
+    if errorlevel 1 (
+        echo Installation failed. Check network access or compatible offline wheels.
+        pause
+        exit /b 1
     )
     echo Setup complete.
 )

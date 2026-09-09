@@ -1,17 +1,17 @@
 # InsightAgent — AI-Powered Website Intelligence
 
 > **Scan any website in seconds. Get an AI-generated SEO audit, action plan, and PDF report.**
-> Works 100% offline — perfect for USB deployment. No data ever leaves your machine.
+> Runs locally. Website scans need network access; enabled AI providers receive analysis inputs.
+> The source ZIP contains no API keys, personal reports or preinstalled Python environment.
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Offline Ready](https://img.shields.io/badge/Offline-Ready-green.svg)](#usb-offline-mode)
 
 ---
 
 ## What It Does
 
-InsightAgent scans a website and produces a professional intelligence report in under 60 seconds:
+InsightAgent scans a website and produces an SEO audit and action plan. Duration depends on the target and configured providers:
 
 | Module | What it analyzes |
 |--------|-----------------|
@@ -23,9 +23,20 @@ InsightAgent scans a website and produces a professional intelligence report in 
 
 **AI Chain (automatic fallback):**
 ```
-NVIDIA NIM → Groq → Google Gemini → Rule-Based (always works offline)
+NVIDIA NIM → Groq → Google Gemini → Rule-Based
 ```
-All providers are optional. InsightAgent works without any API key using built-in rule-based analysis.
+All AI providers are optional. Rule-based analysis requires no AI key; collecting live website data still requires a network connection.
+
+## v2.0 source distribution and OCC
+
+Build: `python3 scripts/build_release.py --output /tmp/InsightAgent-v2.0.zip`.
+The release builder includes only distribution source files, excludes private data and refuses known credential patterns.
+SHA-256 accompanies the archive. Python 3.10+ and dependency installation are required.
+macOS/Linux: `bash launch.command`; Windows: `launch.bat`.
+The launchers retry incomplete dependency setup and stop if installation fails.
+Offline dependency installation requires compatible wheels; the source ZIP alone is not a full offline bundle.
+OCC embeds `/insight-agent/` behind its login and CSRF checks. Keep the standalone dashboard bound to loopback.
+Credential fields are write-only; an empty field preserves the configured key.
 
 ---
 
@@ -64,30 +75,13 @@ source .venv/bin/activate       # Windows: .venv\Scripts\activate.bat
 pip install -r requirements.txt
 ```
 
-### USB Offline Mode
+### Offline dependency installation
 
-**Prepare USB on an internet-connected machine (one time):**
-```bash
-git clone https://github.com/teyfikoz/insight-agent.git
-cd insight-agent
-./make_usb.sh /Volumes/MY_USB   # macOS
-# or
-./make_usb.sh /media/MY_USB     # Linux
-```
-
-**Use on any offline machine:**
-```
-USB:/InsightAgent/
-  ├── launch.command    ← macOS: double-click to start
-  ├── launch.bat        ← Windows: double-click to start
-  ├── wheels/           ← all Python packages (51 files, offline install)
-  └── ...
-```
-
-Double-clicking `launch.command` (Mac) or `launch.bat` (Windows):
-1. Creates a Python virtual environment automatically
-2. Installs all dependencies from the bundled wheels (no internet needed)
-3. Opens the dashboard at `http://localhost:7890`
+The source ZIP does not include wheels or Python. Prepare a `wheels/` folder
+for the target operating system, CPU architecture and Python version before
+using the launcher without internet. Put it beside `launch.command`/`launch.bat`
+or in the parent directory. A wheel set from macOS does not establish Windows
+compatibility. Live website scans and cloud AI still need network access.
 
 ---
 
@@ -101,7 +95,7 @@ python3 main.py --target example.com
 # PDF + Markdown report
 python3 main.py --target example.com --output ~/Desktop/reports/
 
-# No PDF (faster, useful offline)
+# Skip PDF generation
 python3 main.py --target example.com --no-pdf
 
 # With target keywords
@@ -149,19 +143,16 @@ InsightAgent works without any API key. Keys unlock AI-powered insights:
 
 ```bash
 # Create .env in the project folder
-NVIDIA_NIM_API_KEY=nvapi-...   # Best quality — free credits at signup
-GROQ_API_KEY=gsk_...           # Fast & free — 14,400 req/day
-GEMINI_API_KEY=AIza...         # 1M context — free at aistudio.google.com
+NVIDIA_NIM_API_KEY=your_nim_key
+GROQ_API_KEY=your_groq_key
+GEMINI_API_KEY=your_gemini_key
 ```
 
 Or set them through the **Settings** tab in the dashboard.
 
-| Provider | Model | Free Tier | Quality |
-|----------|-------|-----------|---------|
-| NVIDIA NIM | Llama 3.3 70B | Credits on signup | ⭐⭐⭐ Best |
-| Groq | Llama 3.3 70B | 14,400 req/day | ⭐⭐⭐ Fast |
-| Google Gemini | Gemini 2.0 Flash | 1M tokens/day | ⭐⭐ |
-| Rule-Based | Built-in | Always free | ⭐ Offline |
+Provider availability, model support and quotas depend on your account.
+Review the configured model names in `agents/base_agent.py` before use.
+Rule-based analysis uses no paid AI API.
 
 ---
 
@@ -266,16 +257,24 @@ httpx, feedparser                 — Extended data fetching
 pyyaml                            — Config
 ```
 
-All dependencies are bundled in the USB package (`wheels/` folder).
+The source distribution installs these dependencies on first launch.
+Optional training and USB preparation scripts listed above belong to the full
+GitHub checkout; they are not included in the minimal source ZIP.
 
 ---
 
 ## Privacy & Security
 
-- **No telemetry.** InsightAgent never phones home.
-- **Local only.** All scans, reports, and API keys stay on your machine.
-- **API keys** are stored in `.env` — git-ignored by default, never logged.
-- **Offline mode** — works completely without internet when using USB bundle.
+- Reports are saved locally. Website requests contact the selected sites;
+  configured AI providers receive the analysis inputs sent by their adapters.
+- API keys are stored in the local `.env` with owner-only permissions when
+  saved through Settings. Settings responses do not return the keys.
+- Use only your own environment variables or project `.env`; credentials are
+  not imported from another application's private configuration.
+- The standalone dashboard has no multi-user login. Keep it on loopback;
+  remote access must go through OCC authentication and CSRF protections.
+- Review scan results before sharing them. No independent security audit or
+  claim of complete offline website analysis is implied by this release.
 
 ---
 

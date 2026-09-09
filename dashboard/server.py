@@ -251,12 +251,20 @@ async def get_settings():
             if line and not line.startswith("#") and "=" in line:
                 k, _, v = line.partition("=")
                 settings[k.strip()] = v.strip().strip('"\'')
-    return JSONResponse(settings)
+    # Never return credential values to a browser or reverse proxy.
+    public = {k: v for k, v in settings.items() if k in {"DEFAULT_REPORT", "SCAN_TIMEOUT"}}
+    public["configured"] = {k: bool(settings.get(k) or os.environ.get(k)) for k in
+                            ("NVIDIA_NIM_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY")}
+    return JSONResponse(public)
 
 
 @app.post("/api/settings")
 async def save_settings(request: Request):
     data = await request.json()
+    allowed = {"NVIDIA_NIM_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY", "DEFAULT_REPORT", "SCAN_TIMEOUT"}
+    if (not isinstance(data, dict) or any(k not in allowed or not isinstance(v, str)
+            or "\n" in v or "\r" in v for k, v in data.items())):
+        return JSONResponse({"error": "Invalid settings"}, status_code=400)
     env_file = ROOT / ".env"
     existing: dict[str, str] = {}
     if env_file.exists():
@@ -267,9 +275,9 @@ async def save_settings(request: Request):
     for k, v in data.items():
         if v:
             existing[k] = v
-        elif k in existing and not v:
-            del existing[k]
+        # Empty password fields mean unchanged; remove keys explicitly in .env.
     env_file.write_text("\n".join(f"{k}={v}" for k, v in existing.items()) + "\n")
+    env_file.chmod(0o600)
     for k, v in existing.items():
         os.environ[k] = v
     return JSONResponse({"status": "ok", "message": f"Saved {len(existing)} settings"})
@@ -336,6 +344,8 @@ async def monitor_list():
 # ── Launcher ──────────────────────────────────────────────────────────────────
 
 def run(host: str = "127.0.0.1", port: int = 7890, open_browser: bool = True):
+    port = int(os.environ.get("INSIGHT_AGENT_PORT", str(port)))
+    open_browser = open_browser and os.environ.get("INSIGHT_AGENT_NO_BROWSER") != "1"
     if open_browser:
         import threading as _t
         import webbrowser

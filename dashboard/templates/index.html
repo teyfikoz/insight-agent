@@ -607,6 +607,20 @@
 
 <!-- ── JavaScript ─────────────────────────────────────────────────────────── -->
 <script>
+// Keep standalone and authenticated OCC iframe requests on their own API paths.
+const insightBase = location.pathname.startsWith('/insight-agent/') ? '/insight-agent' : '';
+const directFetch = window.fetch.bind(window);
+window.fetch = async (input, init = {}) => {
+  if (insightBase && typeof input === 'string' && input.startsWith('/api/')) {
+    const headers = new Headers(init.headers);
+    if (!['GET', 'HEAD', 'OPTIONS'].includes((init.method || 'GET').toUpperCase())) {
+      const auth = await directFetch('/api/auth/status').then(r => r.json());
+      if (auth.csrfToken) headers.set('X-Command-Center-CSRF', auth.csrfToken);
+    }
+    return directFetch(insightBase + input, { ...init, headers });
+  }
+  return directFetch(input, init);
+};
 let currentJobId = null;
 let pollTimer = null;
 let allReports = [];
@@ -939,11 +953,11 @@ function closeViewer() {
 }
 
 function downloadReport() {
-  if (currentViewerFile) window.open('/api/report/' + currentViewerFile + '/download', '_blank');
+  if (currentViewerFile) window.open(insightBase + '/api/report/' + encodeURIComponent(currentViewerFile) + '/download', '_blank');
 }
 
 function dlReport(filename) {
-  window.open('/api/report/' + filename + '/download', '_blank');
+  window.open(insightBase + '/api/report/' + encodeURIComponent(filename) + '/download', '_blank');
 }
 
 // Skills
@@ -957,9 +971,10 @@ async function loadSkillStatus() {
 // Settings
 async function loadSettings() {
   const d = await fetch('/api/settings').then(r => r.json());
-  if (d.NVIDIA_NIM_API_KEY) document.getElementById('key-nim').value = d.NVIDIA_NIM_API_KEY;
-  if (d.GROQ_API_KEY) document.getElementById('key-groq').value = d.GROQ_API_KEY;
-  if (d.GEMINI_API_KEY) document.getElementById('key-gemini').value = d.GEMINI_API_KEY;
+  for (const [field, key] of [['key-nim', 'NVIDIA_NIM_API_KEY'], ['key-groq', 'GROQ_API_KEY'], ['key-gemini', 'GEMINI_API_KEY']]) {
+    document.getElementById(field).value = '';
+    document.getElementById(field).placeholder = d.configured?.[key] ? 'Configured — leave blank to keep' : 'Not configured';
+  }
   if (d.DEFAULT_REPORT) document.getElementById('default-report').value = d.DEFAULT_REPORT;
   if (d.SCAN_TIMEOUT) document.getElementById('scan-timeout').value = d.SCAN_TIMEOUT;
 }

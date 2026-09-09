@@ -36,17 +36,6 @@ def _load_env() -> None:
                 key, _, val = line.partition("=")
                 os.environ.setdefault(key.strip(), val.strip().strip('"\''))
 
-    # Also try secrets.env from memory dir
-    secrets_file = Path.home() / ".claude/projects/-Users-teyfikoz/memory/secrets.env"
-    if secrets_file.exists():
-        for line in secrets_file.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                key, _, val = line.partition("=")
-                k = key.strip()
-                if k in ("NVIDIA_NIM_API_KEY", "GROQ_API_KEY"):
-                    os.environ.setdefault(k, val.strip().strip('"\''))
-
 
 @click.command(context_settings={"ignore_unknown_options": True})
 @click.option("--target", "-t", default="", help="URL or domain to analyze")

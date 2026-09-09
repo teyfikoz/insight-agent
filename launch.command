@@ -14,7 +14,7 @@ echo ""
 
 # Find python3
 PYTHON=""
-for py in python3.12 python3.11 python3.10 python3; do
+for py in python3.13 python3.12 python3.11 python3.10 python3; do
   if command -v "$py" &>/dev/null; then
     PYTHON=$(command -v "$py")
     break
@@ -35,16 +35,18 @@ if [ ! -d ".venv" ]; then
   echo "Setting up environment (first run)..."
   "$PYTHON" -m venv .venv
 
-  # Install from wheels if available (offline), else pip
-  WHEELS_DIR="$DIR/../wheels"
+fi
+
+# Retry a failed first installation; existence of .venv is not proof of setup.
+if ! .venv/bin/python -c 'import fastapi, uvicorn, click, rich, requests, bs4, lxml, openai, groq, fpdf, yaml, whois, dns, certifi, multipart, httpx, feedparser' >/dev/null 2>&1; then
+  WHEELS_DIR="$DIR/wheels"
+  if [ ! -d "$WHEELS_DIR" ]; then WHEELS_DIR="$DIR/../wheels"; fi
   if [ -d "$WHEELS_DIR" ]; then
     echo "Installing from USB wheels (offline mode)..."
     .venv/bin/pip install --quiet --no-index --find-links="$WHEELS_DIR" -r requirements.txt
-    .venv/bin/pip install --quiet --no-index --find-links="$WHEELS_DIR" fastapi uvicorn python-multipart 2>/dev/null || true
   else
     echo "Installing from internet..."
     .venv/bin/pip install --quiet -r requirements.txt
-    .venv/bin/pip install --quiet fastapi uvicorn python-multipart
   fi
   echo "Setup complete."
 fi
