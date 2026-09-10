@@ -179,43 +179,43 @@
   </div>
   <nav class="nav">
     <div class="nav-section">Main</div>
-    <div class="nav-item active" data-page="overview" onclick="nav(this,'overview')">
+    <div class="nav-item active" data-page="overview" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       Overview
     </div>
-    <div class="nav-item" data-page="scan" onclick="nav(this,'scan')">
+    <div class="nav-item" data-page="scan" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       New Scan
     </div>
-    <div class="nav-item" data-page="bulk" onclick="nav(this,'bulk')">
+    <div class="nav-item" data-page="bulk" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       Bulk Scan
     </div>
-    <div class="nav-item" data-page="monitor" onclick="nav(this,'monitor')">
+    <div class="nav-item" data-page="monitor" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Monitor
       <span class="nav-badge green" id="monitor-badge" style="display:none">0</span>
     </div>
     <div class="nav-section">Data</div>
-    <div class="nav-item" data-page="jobs" onclick="nav(this,'jobs')">
+    <div class="nav-item" data-page="jobs" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Jobs
       <span class="nav-badge" id="jobs-badge" style="display:none">0</span>
     </div>
-    <div class="nav-item" data-page="reports" onclick="nav(this,'reports')">
+    <div class="nav-item" data-page="reports" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       Reports
     </div>
     <div class="nav-section">Config</div>
-    <div class="nav-item" data-page="skills" onclick="nav(this,'skills')">
+    <div class="nav-item" data-page="skills" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       Skills &amp; AI
     </div>
-    <div class="nav-item" data-page="settings" onclick="nav(this,'settings')">
+    <div class="nav-item" data-page="settings" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       Settings
     </div>
-    <div class="nav-item" data-page="help" onclick="nav(this,'help')">
+    <div class="nav-item" data-page="help" data-action="navigate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       Help &amp; Guide
     </div>
@@ -253,7 +253,7 @@
           <input type="text" id="quick-target" placeholder="example.com or https://..." />
         </div>
         <div class="flex">
-          <button class="btn" onclick="quickScan()">Start Scan</button>
+          <button class="btn" data-action="quick-scan">Start Scan</button>
           <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
             <input type="checkbox" id="quick-nopdf" style="width:auto"> Skip PDF
           </label>
@@ -297,7 +297,7 @@
       </div>
     </div>
     <div class="flex">
-      <button class="btn" id="scan-btn" onclick="startScan()">Launch Scan</button>
+      <button class="btn" id="scan-btn" data-action="start-scan">Launch Scan</button>
       <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
         <input type="checkbox" id="scan-nopdf" style="width:auto"> Skip PDF
       </label>
@@ -339,7 +339,7 @@
         <input type="text" id="bulk-keywords" placeholder="product, service, brand" />
       </div>
     </div>
-    <button class="btn" id="bulk-btn" onclick="startBulk()">Launch Bulk Scan</button>
+    <button class="btn" id="bulk-btn" data-action="start-bulk">Launch Bulk Scan</button>
     <span style="font-size:11px;color:var(--muted);margin-left:10px" id="bulk-count-label"></span>
   </div>
   <div id="bulk-results" class="batch-grid"></div>
@@ -365,11 +365,11 @@
             <option value="604800">Every week</option>
           </select>
         </div>
-        <button class="btn btn-green" onclick="startMonitor()">Start Monitoring</button>
+        <button class="btn btn-green" data-action="start-monitor">Start Monitoring</button>
       </div>
     </div>
     <div>
-      <div class="flex-between"><div class="section-title">Active Monitors</div><button class="btn btn-outline btn-sm" onclick="loadMonitors()">Refresh</button></div>
+      <div class="flex-between"><div class="section-title">Active Monitors</div><button class="btn btn-outline btn-sm" data-action="load-monitors">Refresh</button></div>
       <div id="monitor-list"><div class="empty">No monitors running</div></div>
     </div>
   </div>
@@ -379,7 +379,7 @@
 <div class="page" id="page-jobs">
   <div class="flex-between">
     <div class="page-header" style="margin-bottom:0"><h2>Jobs</h2><p>All scan jobs this session</p></div>
-    <button class="btn btn-outline btn-sm" onclick="loadJobs()">Refresh</button>
+    <button class="btn btn-outline btn-sm" data-action="load-jobs">Refresh</button>
   </div>
   <br>
   <div id="jobs-list"><div class="empty">No jobs yet</div></div>
@@ -390,8 +390,8 @@
   <div class="flex-between">
     <div class="page-header" style="margin-bottom:0"><h2>Reports</h2><p>All generated audit reports</p></div>
     <div class="flex">
-      <input type="text" class="search-input" id="report-search" placeholder="Filter by domain..." oninput="filterReports()">
-      <button class="btn btn-outline btn-sm" onclick="loadReports()">Refresh</button>
+      <input type="text" class="search-input" id="report-search" placeholder="Filter by domain...">
+      <button class="btn btn-outline btn-sm" data-action="load-reports">Refresh</button>
     </div>
   </div>
   <br>
@@ -405,8 +405,8 @@
     <div class="flex-between" style="margin-top:16px">
       <div class="section-title" id="viewer-title">—</div>
       <div class="flex">
-        <button class="btn btn-outline btn-sm" id="viewer-download-btn" onclick="downloadReport()">Download PDF</button>
-        <button class="btn btn-outline btn-sm" onclick="closeViewer()">Close</button>
+        <button class="btn btn-outline btn-sm" id="viewer-download-btn" data-action="download-report">Download PDF</button>
+        <button class="btn btn-outline btn-sm" data-action="close-viewer">Close</button>
       </div>
     </div>
     <div class="report-viewer"><div class="report-content" id="report-content"></div></div>
@@ -479,8 +479,8 @@
           <input type="password" id="key-gemini" placeholder="AIza..." />
         </div>
         <div class="flex">
-          <button class="btn" onclick="saveSettings()">Save to .env</button>
-          <button class="btn btn-outline btn-sm" onclick="loadSettings()">Reload</button>
+          <button class="btn" data-action="save-settings">Save to .env</button>
+          <button class="btn btn-outline btn-sm" data-action="load-settings">Reload</button>
         </div>
       </div>
       <div class="panel-box" style="margin-bottom:0">
@@ -499,7 +499,7 @@
             <input type="number" id="scan-timeout" value="120" min="30" max="300" />
           </div>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="saveDefaults()" style="margin-top:12px">Save Defaults</button>
+        <button class="btn btn-outline btn-sm" data-action="save-defaults" style="margin-top:12px">Save Defaults</button>
       </div>
     </div>
     <div>
@@ -606,409 +606,6 @@
 <div class="toast" id="toast"></div>
 
 <!-- ── JavaScript ─────────────────────────────────────────────────────────── -->
-<script>
-// Keep standalone and authenticated OCC iframe requests on their own API paths.
-const insightBase = location.pathname.startsWith('/insight-agent/') ? '/insight-agent' : '';
-const directFetch = window.fetch.bind(window);
-window.fetch = async (input, init = {}) => {
-  if (insightBase && typeof input === 'string' && input.startsWith('/api/')) {
-    const headers = new Headers(init.headers);
-    if (!['GET', 'HEAD', 'OPTIONS'].includes((init.method || 'GET').toUpperCase())) {
-      const auth = await directFetch('/api/auth/status').then(r => r.json());
-      if (auth.csrfToken) headers.set('X-Command-Center-CSRF', auth.csrfToken);
-    }
-    return directFetch(insightBase + input, { ...init, headers });
-  }
-  return directFetch(input, init);
-};
-let currentJobId = null;
-let pollTimer = null;
-let allReports = [];
-let currentViewerFile = null;
-
-// Navigation
-function nav(el, page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  el.classList.add('active');
-  const actions = {
-    overview: loadOverview,
-    reports: loadReports,
-    jobs: loadJobs,
-    skills: loadSkillStatus,
-    settings: loadSettings,
-    monitor: loadMonitors,
-    bulk: () => updateBulkCount(),
-  };
-  if (actions[page]) actions[page]();
-}
-
-function toast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  setTimeout(() => t.className = 'toast', 3000);
-}
-
-// Status & API dots
-async function loadStatus() {
-  try {
-    const d = await fetch('/api/status').then(r => r.json());
-    document.getElementById('stat-reports').textContent = d.reports_count;
-    document.getElementById('stat-jobs').textContent = d.active_jobs;
-    document.getElementById('stat-monitors').textContent = d.monitors_active || 0;
-    document.getElementById('stat-skill').textContent = d.has_optimized_skill ? 'Optimized ✓' : 'Seed';
-
-    // API dots
-    ['nim','groq','gemini'].forEach(k => {
-      const dot = document.getElementById('dot-' + k);
-      dot.className = 'dot ' + (d['api_' + k] ? 'on' : 'off');
-    });
-
-    // Badges
-    const jb = document.getElementById('jobs-badge');
-    if (d.active_jobs > 0) { jb.textContent = d.active_jobs; jb.style.display = ''; }
-    else { jb.style.display = 'none'; }
-
-    const mb = document.getElementById('monitor-badge');
-    if ((d.monitors_active || 0) > 0) { mb.textContent = d.monitors_active; mb.style.display = ''; }
-    else { mb.style.display = 'none'; }
-  } catch {}
-}
-
-// Overview
-async function loadOverview() {
-  await loadStatus();
-  allReports = await fetch('/api/reports').then(r => r.json());
-  const el = document.getElementById('recent-list');
-  if (!allReports.length) { el.innerHTML = '<div class="empty" style="padding:16px">No reports yet. Run your first scan!</div>'; return; }
-  el.innerHTML = allReports.slice(0, 4).map(r => `
-    <div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-size:13px;font-weight:600">${r.domain}</div>
-        <div style="font-size:11px;color:var(--muted)">${r.created}</div>
-      </div>
-      <div class="flex" style="gap:6px">
-        ${r.score != null ? scoreBadge(r.score) : ''}
-        <button class="btn btn-outline btn-sm" onclick="openReport('${r.filename}')">View</button>
-      </div>
-    </div>
-  `).join('');
-  drawSparkline(allReports.slice(0, 10).reverse().filter(r => r.score != null));
-}
-
-function scoreBadge(score) {
-  const cls = score >= 75 ? 'score-a' : score >= 50 ? 'score-b' : 'score-c';
-  return `<span class="score-badge ${cls}">${score}</span>`;
-}
-
-function drawSparkline(data) {
-  if (data.length < 2) return;
-  document.getElementById('score-chart-wrap').style.display = 'block';
-  const svg = document.getElementById('sparkline');
-  const scores = data.map(r => r.score);
-  const min = Math.min(...scores) - 5;
-  const max = Math.max(...scores) + 5;
-  const W = 400, H = 50;
-  const pts = scores.map((s, i) => {
-    const x = (i / (scores.length - 1)) * W;
-    const y = H - ((s - min) / (max - min)) * H;
-    return `${x},${y}`;
-  }).join(' ');
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  svg.innerHTML = `
-    <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
-    ${scores.map((s, i) => {
-      const x = (i / (scores.length - 1)) * W;
-      const y = H - ((s - min) / (max - min)) * H;
-      return `<circle cx="${x}" cy="${y}" r="3" fill="var(--accent2)"/><title>${data[i].domain}: ${s}/100</title>`;
-    }).join('')}
-  `;
-}
-
-// Quick scan
-function quickScan() {
-  const t = document.getElementById('quick-target').value.trim();
-  if (!t) { toast('Enter a target domain', 'error'); return; }
-  document.getElementById('scan-target').value = t;
-  document.getElementById('scan-nopdf').checked = document.getElementById('quick-nopdf').checked;
-  document.querySelector('[data-page="scan"]').click();
-  setTimeout(startScan, 80);
-}
-
-// Single scan
-async function startScan() {
-  const target = document.getElementById('scan-target').value.trim();
-  if (!target) { toast('Enter a target domain', 'error'); return; }
-  const btn = document.getElementById('scan-btn');
-  btn.disabled = true; btn.textContent = 'Scanning…';
-  const payload = {
-    target,
-    report_type: document.getElementById('scan-type').value,
-    keywords: document.getElementById('scan-keywords').value,
-    no_pdf: document.getElementById('scan-nopdf').checked,
-  };
-  const d = await fetch('/api/scan', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
-  currentJobId = d.job_id;
-  document.getElementById('scan-result-area').style.display = 'block';
-  document.getElementById('scan-job-target').textContent = target;
-  document.getElementById('scan-output').style.display = 'none';
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(() => pollJob(currentJobId, 'scan'), 1500);
-}
-
-async function pollJob(jobId, context) {
-  const job = await fetch('/api/job/' + jobId).then(r => r.json());
-  if (context === 'scan') {
-    document.getElementById('scan-job-badge').textContent = job.status.toUpperCase();
-    document.getElementById('scan-job-badge').className = 'badge ' + job.status;
-    const bar = document.getElementById('scan-progress-bar');
-    if (job.status === 'running') bar.style.width = '60%';
-    else if (job.status === 'done') bar.style.width = '100%';
-    else if (job.status === 'error') { bar.style.width = '100%'; bar.style.background = 'var(--red)'; }
-    document.getElementById('scan-job-meta').textContent = `${job.progress} · ${job.started_at}${job.finished_at ? ' → ' + job.finished_at : ''}`;
-    if (job.output) {
-      const out = document.getElementById('scan-output');
-      out.style.display = 'block';
-      out.textContent = job.output.slice(-2000);
-      out.scrollTop = out.scrollHeight;
-    }
-    if (job.status === 'done' || job.status === 'error') {
-      clearInterval(pollTimer);
-      document.getElementById('scan-btn').disabled = false;
-      document.getElementById('scan-btn').textContent = 'Launch Scan';
-      toast(job.status === 'done' ? (job.score ? `Done — SEO Score: ${job.score}/100` : 'Scan complete!') : 'Scan failed', job.status === 'done' ? 'success' : 'error');
-      loadStatus();
-    }
-  }
-  return job;
-}
-
-// Bulk scan
-function updateBulkCount() {
-  const lines = document.getElementById('bulk-targets')?.value.split('\n').filter(l => l.trim()).length || 0;
-  const lbl = document.getElementById('bulk-count-label');
-  if (lbl) lbl.textContent = lines > 0 ? `${Math.min(lines, 10)} domain(s) queued` : '';
-}
-
-async function startBulk() {
-  const targets = document.getElementById('bulk-targets').value;
-  if (!targets.trim()) { toast('Enter at least one domain', 'error'); return; }
-  const btn = document.getElementById('bulk-btn');
-  btn.disabled = true; btn.textContent = 'Launching…';
-  const payload = {
-    targets,
-    report_type: document.getElementById('bulk-type').value,
-    keywords: document.getElementById('bulk-keywords').value,
-  };
-  const d = await fetch('/api/scan/batch', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
-  if (d.error) { toast(d.error, 'error'); btn.disabled = false; btn.textContent = 'Launch Bulk Scan'; return; }
-  toast(`${d.count} scans started!`, 'info');
-  btn.disabled = false; btn.textContent = 'Launch Bulk Scan';
-  // Render job cards
-  const grid = document.getElementById('bulk-results');
-  grid.innerHTML = d.job_ids.map(jid => `
-    <div class="job-card" id="bulk-job-${jid}">
-      <div class="job-header">
-        <span class="job-target" id="bulk-t-${jid}">Loading…</span>
-        <span class="badge queued" id="bulk-b-${jid}">QUEUED</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="bulk-p-${jid}" style="width:5%"></div></div>
-      <div class="job-meta" id="bulk-m-${jid}">Waiting…</div>
-    </div>
-  `).join('');
-  // Poll all
-  d.job_ids.forEach(jid => pollBulkJob(jid));
-}
-
-async function pollBulkJob(jid) {
-  const poll = setInterval(async () => {
-    const job = await fetch('/api/job/' + jid).then(r => r.json());
-    const t = document.getElementById('bulk-t-' + jid);
-    const b = document.getElementById('bulk-b-' + jid);
-    const p = document.getElementById('bulk-p-' + jid);
-    const m = document.getElementById('bulk-m-' + jid);
-    if (!t) { clearInterval(poll); return; }
-    if (t) t.textContent = job.target;
-    if (b) { b.textContent = job.status.toUpperCase(); b.className = 'badge ' + job.status; }
-    if (p) p.style.width = job.status === 'done' ? '100%' : job.status === 'running' ? '60%' : '10%';
-    if (m) m.innerHTML = job.progress + (job.score ? ` · SEO Score: <strong>${job.score}/100</strong>` : '');
-    if (job.status === 'done' || job.status === 'error') {
-      clearInterval(poll);
-      loadStatus();
-    }
-  }, 2000);
-}
-
-// Monitor
-async function startMonitor() {
-  const target = document.getElementById('mon-target').value.trim();
-  if (!target) { toast('Enter a target domain', 'error'); return; }
-  const interval = parseInt(document.getElementById('mon-interval').value);
-  const d = await fetch('/api/monitor/start', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ target, interval }) }).then(r => r.json());
-  if (d.status === 'started') { toast(`Monitor started: ${target}`, 'success'); loadMonitors(); loadStatus(); }
-  else toast(d.error || 'Failed', 'error');
-}
-
-async function stopMonitor(target) {
-  await fetch('/api/monitor/stop', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ target }) });
-  toast(`Monitor stopped: ${target}`);
-  loadMonitors(); loadStatus();
-}
-
-async function loadMonitors() {
-  const monitors = await fetch('/api/monitor/list').then(r => r.json());
-  const el = document.getElementById('monitor-list');
-  if (!monitors.length) { el.innerHTML = '<div class="empty">No monitors running</div>'; return; }
-  el.innerHTML = monitors.map(m => `
-    <div class="monitor-card">
-      <div class="monitor-info">
-        <div class="monitor-domain">${m.target}</div>
-        <div class="monitor-meta">
-          Interval: ${fmtInterval(m.interval)} · Scans: ${m.scan_count}
-          ${m.last_scan ? ' · Last: ' + m.last_scan : ' · First scan pending'}
-        </div>
-      </div>
-      <div class="flex" style="gap:8px;flex-shrink:0">
-        <span class="badge ${m.status}">${m.status.toUpperCase()}</span>
-        ${m.status === 'running' ? `<button class="btn btn-red btn-sm" onclick="stopMonitor('${m.target}')">Stop</button>` : ''}
-      </div>
-    </div>
-  `).join('');
-}
-
-function fmtInterval(s) {
-  if (s >= 86400) return (s/86400|0) + 'd';
-  if (s >= 3600) return (s/3600|0) + 'h';
-  return (s/60|0) + 'm';
-}
-
-// Jobs
-async function loadJobs() {
-  const jobs = await fetch('/api/jobs').then(r => r.json());
-  const el = document.getElementById('jobs-list');
-  if (!jobs.length) { el.innerHTML = '<div class="empty">No jobs this session</div>'; return; }
-  el.innerHTML = jobs.slice().reverse().map(job => `
-    <div class="job-card">
-      <div class="job-header">
-        <span class="job-target">${job.target}</span>
-        <span class="badge ${job.status}">${job.status.toUpperCase()}</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${job.status==='done'?'100':job.status==='running'?'60':job.status==='error'?'100':'10'}%${job.status==='error'?';background:var(--red)':''}"></div></div>
-      <div class="job-meta">
-        #${job.id} · ${job.started_at}${job.finished_at ? ' → ' + job.finished_at : ''}
-        ${job.score != null ? ` · SEO Score: <strong>${job.score}/100</strong>` : ''}
-      </div>
-    </div>
-  `).join('');
-}
-
-// Reports
-async function loadReports() {
-  allReports = await fetch('/api/reports').then(r => r.json());
-  renderReports(allReports);
-}
-
-function renderReports(reports) {
-  const tbody = document.getElementById('reports-table-body');
-  if (!reports.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No reports yet</td></tr>'; return; }
-  tbody.innerHTML = reports.map(r => `
-    <tr>
-      <td style="font-weight:600">${r.domain}</td>
-      <td>${r.score != null ? scoreBadge(r.score) : '<span style="color:var(--muted)">—</span>'}</td>
-      <td>${r.created}</td>
-      <td>${r.size_kb} KB</td>
-      <td>
-        <div class="flex" style="gap:6px">
-          <button class="btn btn-outline btn-sm" onclick="openReport('${r.filename}')">View</button>
-          ${r.has_pdf ? `<button class="btn btn-outline btn-sm" onclick="dlReport('${r.filename}')">PDF</button>` : ''}
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function filterReports() {
-  const q = document.getElementById('report-search').value.toLowerCase();
-  renderReports(allReports.filter(r => r.domain.toLowerCase().includes(q)));
-}
-
-async function openReport(filename) {
-  const d = await fetch('/api/report/' + filename).then(r => r.json());
-  currentViewerFile = filename;
-  document.getElementById('viewer-title').textContent = filename;
-  document.getElementById('report-content').textContent = d.content;
-  const viewer = document.getElementById('report-viewer');
-  const dlBtn = document.getElementById('viewer-download-btn');
-  const rep = allReports.find(r => r.filename === filename);
-  dlBtn.style.display = rep?.has_pdf ? '' : 'none';
-  viewer.style.display = 'block';
-  viewer.scrollIntoView({ behavior: 'smooth' });
-}
-
-function closeViewer() {
-  document.getElementById('report-viewer').style.display = 'none';
-  currentViewerFile = null;
-}
-
-function downloadReport() {
-  if (currentViewerFile) window.open(insightBase + '/api/report/' + encodeURIComponent(currentViewerFile) + '/download', '_blank');
-}
-
-function dlReport(filename) {
-  window.open(insightBase + '/api/report/' + encodeURIComponent(filename) + '/download', '_blank');
-}
-
-// Skills
-async function loadSkillStatus() {
-  const d = await fetch('/api/status').then(r => r.json());
-  const pill = document.getElementById('seo-skill-pill');
-  pill.textContent = d.has_optimized_skill ? 'optimized' : 'seed';
-  pill.className = 'pill ' + (d.has_optimized_skill ? 'optimized' : 'seed');
-}
-
-// Settings
-async function loadSettings() {
-  const d = await fetch('/api/settings').then(r => r.json());
-  for (const [field, key] of [['key-nim', 'NVIDIA_NIM_API_KEY'], ['key-groq', 'GROQ_API_KEY'], ['key-gemini', 'GEMINI_API_KEY']]) {
-    document.getElementById(field).value = '';
-    document.getElementById(field).placeholder = d.configured?.[key] ? 'Configured — leave blank to keep' : 'Not configured';
-  }
-  if (d.DEFAULT_REPORT) document.getElementById('default-report').value = d.DEFAULT_REPORT;
-  if (d.SCAN_TIMEOUT) document.getElementById('scan-timeout').value = d.SCAN_TIMEOUT;
-}
-
-async function saveSettings() {
-  const payload = {
-    NVIDIA_NIM_API_KEY: document.getElementById('key-nim').value.trim(),
-    GROQ_API_KEY: document.getElementById('key-groq').value.trim(),
-    GEMINI_API_KEY: document.getElementById('key-gemini').value.trim(),
-  };
-  const d = await fetch('/api/settings', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
-  toast(d.message || 'Saved!', d.status === 'ok' ? 'success' : 'error');
-  loadStatus();
-}
-
-async function saveDefaults() {
-  const payload = {
-    DEFAULT_REPORT: document.getElementById('default-report').value,
-    SCAN_TIMEOUT: document.getElementById('scan-timeout').value,
-  };
-  const d = await fetch('/api/settings', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }).then(r => r.json());
-  toast(d.message || 'Saved!', d.status === 'ok' ? 'success' : 'error');
-}
-
-// Bulk textarea listener
-document.addEventListener('DOMContentLoaded', () => {
-  const ta = document.getElementById('bulk-targets');
-  if (ta) ta.addEventListener('input', updateBulkCount);
-});
-
-// Init
-loadStatus();
-loadOverview();
-setInterval(loadStatus, 8000);
-</script>
+<script src="./static/app.js" defer></script>
 </body>
 </html>

@@ -26,8 +26,15 @@ class DistributionTests(unittest.TestCase):
         with TestClient(server.app) as client:
             response = client.get("/")
             self.assertEqual(response.status_code, 200)
-            self.assertIn("/insight-agent/", response.text)
-            self.assertIn("X-Command-Center-CSRF", response.text)
+            self.assertIn('<script src="./static/app.js" defer></script>', response.text)
+            self.assertNotIn("<script>", response.text)
+            self.assertNotRegex(response.text, r"\son(?:click|input|change)\s*=")
+            script = client.get("/static/app.js")
+            self.assertEqual(script.status_code, 200)
+            self.assertIn("javascript", script.headers["content-type"])
+            self.assertIn("/insight-agent", script.text)
+            self.assertIn("X-Command-Center-CSRF", script.text)
+            self.assertIn("document.addEventListener('click'", script.text)
 
 
 if __name__ == "__main__":
